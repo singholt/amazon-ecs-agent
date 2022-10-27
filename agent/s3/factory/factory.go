@@ -24,6 +24,7 @@ import (
 	awscreds "github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
@@ -34,8 +35,12 @@ const (
 
 type S3ClientCreator interface {
 	NewS3ClientForBucket(bucket, region string, creds credentials.IAMRoleCredentials) (s3client.S3Client, error)
+	NewS3Client(region string, creds credentials.IAMRoleCredentials) s3iface.S3API
 }
 
+// NewS3ClientCreator provide 2 implementations
+// NewS3ClientForBucket is specific to downloading objects from s3
+// NewS3Client is used for all the other s3 operations
 func NewS3ClientCreator() S3ClientCreator {
 	return &s3ClientCreator{}
 }
@@ -60,6 +65,19 @@ func (*s3ClientCreator) NewS3ClientForBucket(bucket, region string,
 
 	sessWithRegion := session.Must(session.NewSession(cfg.WithRegion(bucketRegion)))
 	return s3manager.NewDownloaderWithClient(s3.New(sessWithRegion)), nil
+}
+
+// NewS3Client returns a new S3 client to support s3 operations which are not provided by s3manager
+func (*s3ClientCreator) NewS3Client(region string,
+	creds credentials.IAMRoleCredentials) s3iface.S3API {
+	cfg := aws.NewConfig().
+		WithHTTPClient(httpclient.New(roundtripTimeout, false)).
+		WithCredentials(
+			awscreds.NewStaticCredentials(creds.AccessKeyID, creds.SecretAccessKey,
+				creds.SessionToken)).WithRegion(region)
+	sess := session.Must(session.NewSession(cfg))
+
+	return s3.New(sess)
 }
 
 func getRegionFromBucket(svc *s3.S3, bucket string) (string, error) {
