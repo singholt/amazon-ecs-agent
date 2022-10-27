@@ -21,7 +21,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 	"github.com/pkg/errors"
 )
 
@@ -30,7 +29,7 @@ const (
 )
 
 // DownloadFile downloads a file from s3 and writes it with the writer.
-func DownloadFile(bucket, key string, timeout time.Duration, w io.WriterAt, client S3Client) error {
+func DownloadFile(bucket, key string, timeout time.Duration, w io.WriterAt, client S3ManagerClient) error {
 	input := &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
@@ -52,7 +51,7 @@ func ParseS3ARN(s3ARN string) (bucket string, key string, err error) {
 	return match[2], match[3], nil
 }
 
-func GetObject(bucket string, key string, client s3iface.S3API) (string, error) {
+func GetObject(bucket string, key string, client S3Client) (string, error) {
 	requestInput := &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
