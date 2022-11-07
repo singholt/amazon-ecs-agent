@@ -21,12 +21,15 @@ import (
 	"io/ioutil"
 	"math"
 	"math/big"
+	"net"
 	"net/http"
 	"net/url"
 	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/docker/go-connections/nat"
 
 	"github.com/aws/amazon-ecs-agent/agent/ecs_client/model/ecs"
 	"github.com/aws/aws-sdk-go/aws"
@@ -263,4 +266,68 @@ func GetENIAttachmentId(eniAttachmentArn string) (string, error) {
 // Proxy is an uncached version of http.ProxyFromEnvironment.
 func Proxy(req *http.Request) (*url.URL, error) {
 	return httpproxy.FromEnvironment().ProxyFunc()(req.URL)
+}
+
+func GetHostPortRange(containerPortRange string, protocol string) (string, error) {
+	// nat.ParsePortRange validates a port range; if valid, it returns start and end of the range, else returns error
+	startContainerPortRange, endContainerPortRange, err := nat.ParsePortRange(containerPortRange)
+	if err != nil {
+		return "", err
+	}
+	numberOfPorts := int(startContainerPortRange - endContainerPortRange + 1)
+
+	// get ephemeral port range, either default or if custom-defined.
+	startHostPortRange, endHostPortRange, err := getDynamicHostPortRange()
+	if err != nil {
+		startHostPortRange, endHostPortRange = defaultPortRangeStart, defaultPortRangeEnd
+	}
+
+	var startPort, lastPort, n int
+	for port := startHostPortRange; port <= endHostPortRange; port++ {
+		portStr := strconv.Itoa(port)
+		// check if port is available
+		if protocol == "tcp" {
+			ln, err := net.Listen(protocol, ":"+portStr)
+			// either port is unavailable or some error occurred while listening
+			// we proceed to the next port in the ephemeral range
+			if err != nil {
+				continue
+			}
+			// let's close the listener first
+			err = ln.Close()
+			if err != nil {
+				return "", err
+			}
+		} else if protocol == "udp" {
+			ln, err := net.ListenPacket(protocol, ":"+portStr)
+			// either port is unavailable or some error occurred while listening
+			// we proceed to the next port in the ephemeral range
+			if err != nil {
+				continue
+			}
+			// let's close the listener first
+			err = ln.Close()
+			if err != nil {
+				return "", err
+			}
+		}
+
+		// check if current port is contiguous relative to lastPort
+		if port-lastPort != 1 {
+			startPort = port
+			lastPort = port
+			n = 1
+		} else {
+			lastPort = port
+			n += 1
+		}
+
+		// we've got contiguous available ephemeral ports to use, equal to the requested numberOfPorts
+		if n == numberOfPorts {
+			break
+		}
+	}
+
+	return strconv.Itoa(startPort) + "-" + strconv.Itoa(lastPort), nil
+	return "", nil
 }

@@ -16,4 +16,15 @@
 
 package utils
 
+const (
+	// defaultPortRangeStart indicates the first port in ephemeral port range
+	defaultPortRangeStart = 49153
+	// defaultPortRangeEnd indicates the last port in ephemeral port range
+	defaultPortRangeEnd = 65535
+)
+
 func GetCanonicalPath(path string) string { return path }
+
+func getDynamicHostPortRange() (start int, end int, err error) {
+	return defaultPortRangeStart, defaultPortRangeEnd, nil
+}

@@ -24,6 +24,14 @@ import (
 	"strings"
 )
 
+const (
+	// Ref: https://learn.microsoft.com/en-US/troubleshoot/windows-server/networking/default-dynamic-port-range-tcpip-chang
+	// defaultPortRangeStart indicates the first port in ephemeral port range
+	defaultPortRangeStart = 49152
+	// defaultPortRangeEnd indicates the last port in ephemeral port range
+	defaultPortRangeEnd = 65535
+)
+
 func GetCanonicalPath(path string) string {
 	lowercasedPath := strings.ToLower(path)
 	// if the path is a bare drive like "d:", don't filepath.Clean it because it will add a '.'.
@@ -79,4 +87,8 @@ func IsAvailableDriveLetter(hostPath string) bool {
 		return true
 	}
 	return false
+}
+
+func getDynamicHostPortRange() (start int, end int, err error) {
+	return defaultPortRangeStart, defaultPortRangeEnd, nil
 }
