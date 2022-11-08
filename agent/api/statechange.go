@@ -14,6 +14,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
@@ -224,7 +225,8 @@ func (c *ContainerStateChange) String() string {
 		res += ", Reason " + c.Reason
 	}
 	if len(c.PortBindings) != 0 {
-		res += fmt.Sprintf(", Ports %v", c.PortBindings)
+		bytes, _ := json.Marshal(c.PortBindings)
+		res += fmt.Sprintf(", Ports %v", string(bytes))
 	}
 	if c.Container != nil {
 		res += ", Known Sent: " + c.Container.GetSentStatus().String()

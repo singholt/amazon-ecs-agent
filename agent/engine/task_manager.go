@@ -15,6 +15,7 @@ package engine
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strconv"
@@ -596,7 +597,8 @@ func getContainerEventLogFields(c api.ContainerStateChange) logger.Fields {
 		f["Reason"] = c.Reason
 	}
 	if len(c.PortBindings) != 0 {
-		f["Ports"] = fmt.Sprintf("%v", c.PortBindings)
+		bytes, _ := json.Marshal(c.PortBindings)
+		f["Ports"] = fmt.Sprintf("%v", string(bytes))
 	}
 	if c.Container != nil {
 		f["KnownSent"] = c.Container.GetSentStatus().String()
