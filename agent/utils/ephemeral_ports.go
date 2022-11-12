@@ -16,6 +16,8 @@ package utils
 import (
 	"fmt"
 	"math/rand"
+	"net"
+	"strconv"
 	"time"
 )
 
@@ -57,4 +59,58 @@ func GenerateEphemeralPortNumbers(n int, reserved []uint16) ([]uint16, error) {
 		result = append(result, port)
 	}
 	return result, nil
+}
+
+// GetContiguousPorts returns contiguous ports between requestStart and requestEnd, equal to numberOfPorts
+func GetContiguousPorts(numberOfPorts, requestStart, requestEnd int, protocol string) (int, int, bool) {
+	var resultStart, resultEnd, n int
+	for currentPort := requestStart; currentPort <= requestEnd; currentPort++ {
+		portStr := strconv.Itoa(currentPort)
+		// check if port is available
+		if protocol == "tcp" {
+			// net.Listen announces on the local tcp network
+			ln, err := net.Listen(protocol, ":"+portStr)
+			// either port is unavailable or some error occurred while listening, we proceed to the next port
+			if err != nil {
+				continue
+			}
+			// let's close the listener first
+			err = ln.Close()
+			if err != nil {
+				continue
+			}
+		} else if protocol == "udp" {
+			// net.ListenPacket announces on the local udp network
+			ln, err := net.ListenPacket(protocol, ":"+portStr)
+			// either port is unavailable or some error occurred while listening, we proceed to the next port
+			if err != nil {
+				continue
+			}
+			// let's close the listener first
+			err = ln.Close()
+			if err != nil {
+				continue
+			}
+		}
+
+		// check if current port is contiguous
+		if currentPort-resultEnd != 1 {
+			resultStart = currentPort
+			resultEnd = currentPort
+			n = 1
+		} else {
+			resultEnd = currentPort
+			n += 1
+		}
+
+		// we've found contiguous host ports to use, equal to the requested numberOfPorts
+		if n == numberOfPorts {
+			break
+		}
+	}
+
+	if n != numberOfPorts {
+		return 0, 0, false
+	}
+	return resultStart, resultEnd, true
 }

@@ -17,6 +17,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/aws/amazon-ecs-agent/agent/engine/portmapper"
+
 	"github.com/aws/amazon-ecs-agent/agent/credentials"
 	"github.com/aws/amazon-ecs-agent/agent/data"
 	"github.com/aws/amazon-ecs-agent/agent/engine"
@@ -66,11 +68,11 @@ func (agent *ecsAgent) loadData(containerChangeEventStream *eventstream.EventStr
 	state dockerstate.TaskEngineState,
 	imageManager engine.ImageManager,
 	execCmdMgr execcmd.Manager,
-	serviceConnectManager serviceconnect.Manager) (*savedData, error) {
+	serviceConnectManager serviceconnect.Manager, portMappingManager portmapper.PortMappingManager) (*savedData, error) {
 	s := &savedData{
 		taskEngine: engine.NewTaskEngine(agent.cfg, agent.dockerClient, credentialsManager,
 			containerChangeEventStream, imageManager, state,
-			agent.metadataManager, agent.resourceFields, execCmdMgr, serviceConnectManager),
+			agent.metadataManager, agent.resourceFields, execCmdMgr, serviceConnectManager, portMappingManager),
 	}
 	s.taskEngine.SetDataClient(agent.dataClient)
 

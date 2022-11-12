@@ -25,6 +25,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/aws/amazon-ecs-agent/agent/engine/portmapper"
+
 	"github.com/aws/amazon-ecs-agent/agent/api"
 	"github.com/aws/amazon-ecs-agent/agent/api/appnet"
 	apicontainer "github.com/aws/amazon-ecs-agent/agent/api/container"
@@ -162,6 +164,7 @@ type DockerTaskEngine struct {
 	containerStatusToTransitionFunction map[apicontainerstatus.ContainerStatus]transitionApplyFunc
 	metadataManager                     containermetadata.Manager
 	serviceconnectManager               serviceconnect.Manager
+	portMappingManager                  portmapper.PortMappingManager
 	serviceconnectRelay                 *apitask.Task
 
 	// taskSteadyStatePollInterval is the duration that a managed task waits
@@ -199,7 +202,8 @@ func NewDockerTaskEngine(cfg *config.Config,
 	metadataManager containermetadata.Manager,
 	resourceFields *taskresource.ResourceFields,
 	execCmdMgr execcmd.Manager,
-	serviceConnectManager serviceconnect.Manager) *DockerTaskEngine {
+	serviceConnectManager serviceconnect.Manager,
+	portMappingManager portmapper.PortMappingManager) *DockerTaskEngine {
 	dockerTaskEngine := &DockerTaskEngine{
 		cfg:        cfg,
 		client:     client,
@@ -219,6 +223,7 @@ func NewDockerTaskEngine(cfg *config.Config,
 
 		metadataManager:                   metadataManager,
 		serviceconnectManager:             serviceConnectManager,
+		portMappingManager:                portMappingManager,
 		taskSteadyStatePollInterval:       defaultTaskSteadyStatePollInterval,
 		taskSteadyStatePollIntervalJitter: defaultTaskSteadyStatePollIntervalJitter,
 		resourceFields:                    resourceFields,
@@ -1313,7 +1318,7 @@ func (engine *DockerTaskEngine) createContainer(task *apitask.Task, container *a
 	if versionErr != nil {
 		return dockerapi.DockerContainerMetadata{Error: CannotGetDockerClientVersionError{versionErr}}
 	}
-	hostConfig, hcerr := task.DockerHostConfig(container, containerMap, dockerClientVersion, engine.cfg)
+	hostConfig, hcerr := task.DockerHostConfig(container, containerMap, dockerClientVersion, engine.cfg, engine.portMappingManager)
 	if hcerr != nil {
 		return dockerapi.DockerContainerMetadata{Error: apierrors.NamedError(hcerr)}
 	}

@@ -20,17 +20,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/aws/amazon-ecs-agent/agent/logger"
-	"github.com/aws/amazon-ecs-agent/agent/logger/field"
-
-	"github.com/aws/amazon-ecs-agent/agent/doctor"
-	"github.com/aws/amazon-ecs-agent/agent/eni/watcher"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-
-	"github.com/aws/amazon-ecs-agent/agent/credentials/instancecreds"
-	"github.com/aws/amazon-ecs-agent/agent/engine/execcmd"
-	"github.com/aws/amazon-ecs-agent/agent/metrics"
-
 	acshandler "github.com/aws/amazon-ecs-agent/agent/acs/handler"
 	"github.com/aws/amazon-ecs-agent/agent/api"
 	"github.com/aws/amazon-ecs-agent/agent/api/ecsclient"
@@ -39,20 +28,28 @@ import (
 	"github.com/aws/amazon-ecs-agent/agent/config"
 	"github.com/aws/amazon-ecs-agent/agent/containermetadata"
 	"github.com/aws/amazon-ecs-agent/agent/credentials"
+	"github.com/aws/amazon-ecs-agent/agent/credentials/instancecreds"
 	"github.com/aws/amazon-ecs-agent/agent/data"
 	"github.com/aws/amazon-ecs-agent/agent/dockerclient"
 	"github.com/aws/amazon-ecs-agent/agent/dockerclient/dockerapi"
 	"github.com/aws/amazon-ecs-agent/agent/dockerclient/sdkclientfactory"
+	"github.com/aws/amazon-ecs-agent/agent/doctor"
 	"github.com/aws/amazon-ecs-agent/agent/ec2"
 	"github.com/aws/amazon-ecs-agent/agent/ecs_client/model/ecs"
 	"github.com/aws/amazon-ecs-agent/agent/ecscni"
 	"github.com/aws/amazon-ecs-agent/agent/engine"
 	"github.com/aws/amazon-ecs-agent/agent/engine/dockerstate"
+	"github.com/aws/amazon-ecs-agent/agent/engine/execcmd"
+	"github.com/aws/amazon-ecs-agent/agent/engine/portmapper"
 	engineserviceconnect "github.com/aws/amazon-ecs-agent/agent/engine/serviceconnect"
 	"github.com/aws/amazon-ecs-agent/agent/eni/pause"
+	"github.com/aws/amazon-ecs-agent/agent/eni/watcher"
 	"github.com/aws/amazon-ecs-agent/agent/eventhandler"
 	"github.com/aws/amazon-ecs-agent/agent/eventstream"
 	"github.com/aws/amazon-ecs-agent/agent/handlers"
+	"github.com/aws/amazon-ecs-agent/agent/logger"
+	"github.com/aws/amazon-ecs-agent/agent/logger/field"
+	"github.com/aws/amazon-ecs-agent/agent/metrics"
 	"github.com/aws/amazon-ecs-agent/agent/sighandlers"
 	"github.com/aws/amazon-ecs-agent/agent/sighandlers/exitcodes"
 	"github.com/aws/amazon-ecs-agent/agent/statemanager"
@@ -64,6 +61,8 @@ import (
 	"github.com/aws/amazon-ecs-agent/agent/utils/mobypkgwrapper"
 	"github.com/aws/amazon-ecs-agent/agent/utils/retry"
 	"github.com/aws/amazon-ecs-agent/agent/version"
+	"github.com/aws/aws-sdk-go/aws/awserr"
+
 	"github.com/aws/aws-sdk-go/aws"
 	aws_credentials "github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/cihub/seelog"
@@ -143,6 +142,7 @@ type ecsAgent struct {
 	subnet                      string
 	mac                         string
 	metadataManager             containermetadata.Manager
+	portMappingManager          portmapper.PortMappingManager
 	terminationHandler          sighandlers.TerminationHandler
 	mobyPlugins                 mobypkgwrapper.Plugins
 	resourceFields              *taskresource.ResourceFields
@@ -216,6 +216,10 @@ func newAgent(blackholeEC2Metadata bool, acceptInsecureCert *bool) (agent, error
 		metadataManager = containermetadata.NewManager(dockerClient, cfg)
 	}
 
+	// portMappingManager is used to track the ephemeral port range on the host, and the last host port the agent
+	// assigned to a container.
+	portMappingManager := portmapper.NewPortMappingManager()
+
 	initialSeqNumber := int64(-1)
 	return &ecsAgent{
 		ctx:               ctx,
@@ -235,6 +239,7 @@ func newAgent(blackholeEC2Metadata bool, acceptInsecureCert *bool) (agent, error
 		serviceconnectManager:       engineserviceconnect.NewManager(),
 		cniClient:                   ecscni.NewClient(cfg.CNIPluginsPath),
 		metadataManager:             metadataManager,
+		portMappingManager:          portMappingManager,
 		terminationHandler:          sighandlers.StartDefaultTerminationHandler,
 		mobyPlugins:                 mobypkgwrapper.NewPlugins(),
 		latestSeqNumberTaskManifest: &initialSeqNumber,
@@ -308,7 +313,7 @@ func (agent *ecsAgent) doStart(containerChangeEventStream *eventstream.EventStre
 
 	// Create the task engine
 	taskEngine, currentEC2InstanceID, err := agent.newTaskEngine(
-		containerChangeEventStream, credentialsManager, state, imageManager, execCmdMgr, agent.serviceconnectManager)
+		containerChangeEventStream, credentialsManager, state, imageManager, execCmdMgr, agent.serviceconnectManager, agent.portMappingManager)
 	if err != nil {
 		seelog.Criticalf("Unable to initialize new task engine: %v", err)
 		return exitcodes.ExitTerminal
@@ -512,7 +517,8 @@ func (agent *ecsAgent) newTaskEngine(containerChangeEventStream *eventstream.Eve
 	state dockerstate.TaskEngineState,
 	imageManager engine.ImageManager,
 	execCmdMgr execcmd.Manager,
-	serviceConnectManager engineserviceconnect.Manager) (engine.TaskEngine, string, error) {
+	serviceConnectManager engineserviceconnect.Manager,
+	portMappingManager portmapper.PortMappingManager) (engine.TaskEngine, string, error) {
 
 	containerChangeEventStream.StartListening()
 
@@ -520,10 +526,10 @@ func (agent *ecsAgent) newTaskEngine(containerChangeEventStream *eventstream.Eve
 		seelog.Info("Checkpointing not enabled; a new container instance will be created each time the agent is run")
 		return engine.NewTaskEngine(agent.cfg, agent.dockerClient, credentialsManager,
 			containerChangeEventStream, imageManager, state,
-			agent.metadataManager, agent.resourceFields, execCmdMgr, serviceConnectManager), "", nil
+			agent.metadataManager, agent.resourceFields, execCmdMgr, serviceConnectManager, portMappingManager), "", nil
 	}
 
-	savedData, err := agent.loadData(containerChangeEventStream, credentialsManager, state, imageManager, execCmdMgr, serviceConnectManager)
+	savedData, err := agent.loadData(containerChangeEventStream, credentialsManager, state, imageManager, execCmdMgr, serviceConnectManager, portMappingManager)
 	if err != nil {
 		seelog.Criticalf("Error loading previously saved state: %v", err)
 		return nil, "", err
@@ -545,7 +551,7 @@ func (agent *ecsAgent) newTaskEngine(containerChangeEventStream *eventstream.Eve
 		// Reset taskEngine; all the other values are still default
 		return engine.NewTaskEngine(agent.cfg, agent.dockerClient, credentialsManager,
 			containerChangeEventStream, imageManager, state, agent.metadataManager,
-			agent.resourceFields, execCmdMgr, serviceConnectManager), currentEC2InstanceID, nil
+			agent.resourceFields, execCmdMgr, serviceConnectManager, portMappingManager), currentEC2InstanceID, nil
 	}
 
 	if savedData.cluster != "" {
