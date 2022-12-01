@@ -97,7 +97,6 @@ func GetHostPortRange(numberOfPorts int, protocol string) (string, error) {
 	portLock.Lock()
 	defer portLock.Unlock()
 
-	var resultStartPort, resultEndPort, n int
 	// get ephemeral port range, either default or if custom-defined
 	startHostPortRange, endHostPortRange, err := dynamicHostPortRange()
 	if err != nil {
@@ -117,6 +116,28 @@ func GetHostPortRange(numberOfPorts int, protocol string) (string, error) {
 		start = lastAssignedHostPort + 1
 	}
 
+	result, lastCheckedPort, err := getHostPortRange(numberOfPorts, start, end, protocol)
+	if err != nil {
+		if lastAssignedHostPort != 0 {
+			// this implies that there are no contiguous host ports available from lastAssignedHostPort to endHostPortRange
+			// so, we need to loop back to the startHostPortRange and check for contiguous ports until lastCheckedPort
+			start = startHostPortRange
+			end = lastCheckedPort - 1
+			result, lastCheckedPort, err = getHostPortRange(numberOfPorts, start, end, protocol)
+		}
+	}
+
+	if lastCheckedPort == endHostPortRange {
+		tracker.SetLastAssignedHostPort(startHostPortRange - 1)
+	} else {
+		tracker.SetLastAssignedHostPort(lastCheckedPort)
+	}
+
+	return result, err
+}
+
+func getHostPortRange(numberOfPorts, start, end int, protocol string) (string, int, error) {
+	var resultStartPort, resultEndPort, n int
 	for port := start; port <= end; port++ {
 		portStr := strconv.Itoa(port)
 		// check if port is available
@@ -161,16 +182,10 @@ func GetHostPortRange(numberOfPorts int, protocol string) (string, error) {
 			break
 		}
 	}
+
 	if n != numberOfPorts {
-		return "", fmt.Errorf("%v contiguous host ports unavailable", numberOfPorts)
-	} else {
-		if resultEndPort == endHostPortRange {
-			// we've reached the end of the underlying ephemeral range, so circle back to the start
-			tracker.SetLastAssignedHostPort(startHostPortRange - 1)
-		} else {
-			// update tracker to point to the last assigned port
-			tracker.SetLastAssignedHostPort(resultEndPort)
-		}
+		return "", resultEndPort, fmt.Errorf("%v contiguous host ports unavailable", numberOfPorts)
 	}
-	return fmt.Sprintf("%d-%d", resultStartPort, resultEndPort), nil
+
+	return fmt.Sprintf("%d-%d", resultStartPort, resultEndPort), resultEndPort, nil
 }
