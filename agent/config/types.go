@@ -359,4 +359,12 @@ type Config struct {
 	// WarmPoolsSupport specifies whether the agent should poll IMDS to check the target lifecycle state for a starting
 	// instance
 	WarmPoolsSupport BooleanDefaultFalse
+
+	// CustomACSEndpoint specifies a custom ACS endpoint for the ECS agent to receive task payload from.
+	// By default, ECS agent gets ACS endpoint from the DiscoverPollEndpoint API.
+	CustomACSEndpoint string
+
+	// CustomTCSEndpoint specifies a custom TCS endpoint for ECS agent to send telemetry information to.
+	// By default, ECS agent gets TCS endpoint from the DiscoverTelemetryEndpoint API.
+	CustomTCSEndpoint string
 }

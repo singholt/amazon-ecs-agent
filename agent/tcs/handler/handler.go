@@ -95,11 +95,20 @@ func StartSession(params *TelemetrySessionParams, statsEngine stats.Engine) erro
 }
 
 func startTelemetrySession(params *TelemetrySessionParams, statsEngine stats.Engine) error {
-	tcsEndpoint, err := params.ECSClient.DiscoverTelemetryEndpoint(params.ContainerInstanceArn)
-	if err != nil {
-		seelog.Errorf("tcs: unable to discover poll endpoint: %v", err)
-		return err
+	var tcsEndpoint string
+	var err error
+
+	if params.Cfg.CustomTCSEndpoint != "" {
+		tcsEndpoint = params.Cfg.CustomTCSEndpoint
+	} else {
+		tcsEndpoint, err = params.ECSClient.DiscoverTelemetryEndpoint(params.ContainerInstanceArn)
+		if err != nil {
+			seelog.Errorf("tcs: unable to discover poll endpoint: %v", err)
+			return err
+		}
 	}
+	seelog.Infof("TCS endpoint: %v", tcsEndpoint)
+
 	url := formatURL(tcsEndpoint, params.Cfg.Cluster, params.ContainerInstanceArn, params.TaskEngine)
 	return startSession(params.Ctx, url, params.Cfg, params.CredentialProvider, statsEngine,
 		defaultHeartbeatTimeout, defaultHeartbeatJitter, config.DefaultContainerMetricsPublishInterval,

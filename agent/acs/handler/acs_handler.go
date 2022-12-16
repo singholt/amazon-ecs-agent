@@ -259,11 +259,19 @@ func (acsSession *session) Start() error {
 // startSessionOnce creates a session with ACS and handles requests using the passed
 // in arguments
 func (acsSession *session) startSessionOnce() error {
-	acsEndpoint, err := acsSession.ecsClient.DiscoverPollEndpoint(acsSession.containerInstanceARN)
-	if err != nil {
-		seelog.Errorf("acs: unable to discover poll endpoint, err: %v", err)
-		return err
+	var acsEndpoint string
+	var err error
+
+	if acsSession.agentConfig.CustomACSEndpoint != "" {
+		acsEndpoint = acsSession.agentConfig.CustomACSEndpoint
+	} else {
+		acsEndpoint, err = acsSession.ecsClient.DiscoverPollEndpoint(acsSession.containerInstanceARN)
+		if err != nil {
+			seelog.Errorf("acs: unable to discover poll endpoint, err: %v", err)
+			return err
+		}
 	}
+	seelog.Infof("ACS endpoint: %v", acsEndpoint)
 
 	url := acsWsURL(acsEndpoint, acsSession.agentConfig.Cluster, acsSession.containerInstanceARN, acsSession.taskEngine, acsSession.resources)
 	client := acsSession.resources.createACSClient(url, acsSession.agentConfig)
