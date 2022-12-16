@@ -57,8 +57,8 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/deniswernert/udev v0.0.0-20140626150257-82fe5be8ca5f h1:QBUOtVH4lbBwAvK9G3JIrYWW7CXY4bM5Uu9+9S/HumU=
 github.com/deniswernert/udev v0.0.0-20140626150257-82fe5be8ca5f/go.mod h1:F2ABndSd1vxGohI2r5toC+++cB3sHTyLMvLh18/awOc=
-github.com/didip/tollbooth v3.0.2+incompatible h1:g/4w8M1JnMWn9AGSdGMK7L2KDa/C5eyhvquOJOLAaBQ=
-github.com/didip/tollbooth v3.0.2+incompatible/go.mod h1:A9b0665CE6l1KmzpDws2++elm/CsuWBMa5Jv4WY0PEY=
+github.com/didip/tollbooth v4.0.2+incompatible h1:fVSa33JzSz0hoh2NxpwZtksAzAgd7zjmGO20HCZtF4M=
+github.com/didip/tollbooth v4.0.2+incompatible/go.mod h1:A9b0665CE6l1KmzpDws2++elm/CsuWBMa5Jv4WY0PEY=
 github.com/docker/distribution v0.0.0-20181002220433-1cb4180b1a5b h1:RYRNNRmSa4f4QfQ5Nn9BGezSFf0IO6Q+7g9zkxqd8SA=
 github.com/docker/distribution v0.0.0-20181002220433-1cb4180b1a5b/go.mod h1:J2gT2udsDAN96Uj4KfcMRqY0/ypR+oyYUYmja8H+y+w=
 github.com/docker/docker v0.0.0-20200531234253-77e06fda0c94 h1:YBrOju+pvHeUDXJuZEsIZ6OCxnH1Dwwp/L3Yn6M8H2k=

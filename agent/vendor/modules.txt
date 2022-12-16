@@ -118,7 +118,7 @@ github.com/davecgh/go-spew/spew
 # github.com/deniswernert/udev v0.0.0-20140626150257-82fe5be8ca5f
 ## explicit
 github.com/deniswernert/udev
-# github.com/didip/tollbooth v3.0.2+incompatible
+# github.com/didip/tollbooth v4.0.2+incompatible
 ## explicit
 github.com/didip/tollbooth
 github.com/didip/tollbooth/errors

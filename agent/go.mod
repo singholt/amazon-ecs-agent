@@ -10,7 +10,7 @@ require (
 	github.com/containernetworking/cni v0.8.1
 	github.com/containernetworking/plugins v0.8.6
 	github.com/deniswernert/udev v0.0.0-20140626150257-82fe5be8ca5f
-	github.com/didip/tollbooth v3.0.2+incompatible
+	github.com/didip/tollbooth v4.0.2+incompatible
 	github.com/docker/docker v0.0.0-20200531234253-77e06fda0c94
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-units v0.4.0
@@ -33,6 +33,9 @@ require (
 	golang.org/x/tools v0.1.5
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
+)
+
+require (
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/Microsoft/go-winio v0.4.11 // indirect
 	github.com/Microsoft/hcsshim v0.8.6 // indirect
