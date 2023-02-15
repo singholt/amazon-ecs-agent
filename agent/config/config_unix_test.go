@@ -74,6 +74,7 @@ func TestConfigDefault(t *testing.T) {
 	assert.False(t, cfg.PollMetrics.Enabled(), "ECS_POLL_METRICS default should be false")
 	assert.False(t, cfg.EnableRuntimeStats.Enabled(), "Default EnableRuntimeStats set incorrectly")
 	assert.True(t, cfg.ShouldExcludeIPv6PortBinding.Enabled(), "Default ShouldExcludeIPv6PortBinding set incorrectly")
+	assert.Equal(t, defaultBackendConnectionTimeout, cfg.BackendConnectionTimeout)
 }
 
 // TestConfigFromFile tests the configuration can be read from file

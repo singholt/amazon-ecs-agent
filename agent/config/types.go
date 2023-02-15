@@ -42,6 +42,10 @@ type Config struct {
 	// make calls against. If this value is not set, it will default to the
 	// endpoint for your current AWSRegion
 	APIEndpoint string `trim:"true"`
+	// BackendConnectionTimeout specifies the amount of time before agent closes its connection to ECS back-end.
+	// Currently, this timeout only applies to the ACS websocket connection. In the future, we could apply the same to
+	// other back-end connections like the telemetry session (TACS).
+	BackendConnectionTimeout time.Duration
 	// DockerEndpoint is the address the agent will attempt to connect to the
 	// Docker daemon at. This should have the same value as "DOCKER_HOST"
 	// normally would to interact with the daemon. It defaults to

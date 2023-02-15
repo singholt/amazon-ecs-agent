@@ -48,6 +48,12 @@ const (
 	// without disconnecting
 	heartbeatTimeout = 1 * time.Minute
 	heartbeatJitter  = 1 * time.Minute
+
+	// disconnectJitter in addition to the disconnectTimeout property of an ACS session,
+	// is the maximum time to wait before agent closes the websocket connection.
+	// disconnectJitter is the max jitter time to prevent all agents retrying to ACS at the same time
+	disconnectJitter = 5 * time.Minute
+
 	// wsRWTimeout is the duration of read and write deadline for the
 	// websocket connection
 	wsRWTimeout = 2*heartbeatTimeout + heartbeatJitter
@@ -100,6 +106,8 @@ type session struct {
 	doctor                          *doctor.Doctor
 	_heartbeatTimeout               time.Duration
 	_heartbeatJitter                time.Duration
+	disconnectTimeout               time.Duration
+	disconnectJitter                time.Duration
 	_inactiveInstanceReconnectDelay time.Duration
 }
 
@@ -182,6 +190,8 @@ func NewSession(
 		doctor:                          doctor,
 		_heartbeatTimeout:               heartbeatTimeout,
 		_heartbeatJitter:                heartbeatJitter,
+		disconnectTimeout:               config.BackendConnectionTimeout,
+		disconnectJitter:                disconnectJitter,
 		_inactiveInstanceReconnectDelay: inactiveInstanceReconnectDelay,
 	}
 }
@@ -360,11 +370,16 @@ func (acsSession *session) startACSSession(client wsclient.ClientServer) error {
 	}
 
 	seelog.Info("Connected to ACS endpoint")
-	// Start inactivity timer for closing the connection
-	timer := newDisconnectionTimer(client, acsSession.heartbeatTimeout(), acsSession.heartbeatJitter())
+	// Start the heartbeat timer for closing the connection
+	heartbeatTimer := newDisconnectionTimer(client, acsSession.heartbeatTimeout(), acsSession.heartbeatJitter())
 	// Any message from the server resets the disconnect timeout
-	client.SetAnyRequestHandler(anyMessageHandler(timer, client))
-	defer timer.Stop()
+	client.SetAnyRequestHandler(anyMessageHandler(heartbeatTimer, client))
+	defer heartbeatTimer.Stop()
+
+	// Start the disconnect timer for closing the connection
+	// This is to handle a case where ACS hasn't really disconnected for a while like it should.
+	disconnectTimer := newDisconnectionTimer(client, acsSession.disconnectTimeout, acsSession.disconnectJitter)
+	defer disconnectTimer.Stop()
 
 	acsSession.resources.connectedToACS()
 
@@ -478,8 +493,8 @@ func acsWsURL(endpoint, cluster, containerInstanceArn string, taskEngine engine.
 	return acsURL + "?" + query.Encode()
 }
 
-// newDisconnectionTimer creates a new time object, with a callback to
-// disconnect from ACS on inactivity
+// newDisconnectionTimer creates a new time object, with a callback to disconnect from ACS on inactivity.
+// It is used to create both the heartbeat timer and the disconnect timer.
 func newDisconnectionTimer(client wsclient.ClientServer, timeout time.Duration, jitter time.Duration) ttime.Timer {
 	timer := time.AfterFunc(retry.AddJitter(timeout, jitter), func() {
 		seelog.Warn("ACS Connection hasn't had any activity for too long; closing connection")

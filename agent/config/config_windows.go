@@ -150,6 +150,7 @@ func DefaultConfig() Config {
 		RuntimeStatsLogFile:                 filepath.Join(ecsRoot, defaultRuntimeStatsLogFile),
 		EnableRuntimeStats:                  BooleanDefaultFalse{Value: NotSet},
 		ShouldExcludeIPv6PortBinding:        BooleanDefaultTrue{Value: ExplicitlyEnabled},
+		BackendConnectionTimeout:            defaultBackendConnectionTimeout,
 	}
 }
 

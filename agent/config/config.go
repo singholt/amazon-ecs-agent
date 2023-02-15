@@ -148,6 +148,13 @@ const (
 	// DefaultContainerMetricsPublishInterval is the default interval that we publish
 	// metrics to the ECS telemetry backend (TACS)
 	DefaultContainerMetricsPublishInterval = 20 * time.Second
+
+	// defaultBackendConnectionTimeout is the default amount of time before agent closes
+	// its connection with ECS back-end.
+	defaultBackendConnectionTimeout = 30 * time.Minute
+	// minimumBackendConnectionTimeout specifies the minimum amount of time before agent closes
+	// its connection with ECS back-end.
+	minimumBackendConnectionTimeout = 15 * time.Minute
 )
 
 const (
@@ -361,6 +368,13 @@ func (cfg *Config) validateAndOverrideBounds() error {
 		seelog.Warnf("Invalid values for rate limits, will be overridden with default values: %d,%d.", DefaultTaskMetadataSteadyStateRate, DefaultTaskMetadataBurstRate)
 		cfg.TaskMetadataSteadyStateRate = DefaultTaskMetadataSteadyStateRate
 		cfg.TaskMetadataBurstRate = DefaultTaskMetadataBurstRate
+	}
+
+	if cfg.BackendConnectionTimeout < minimumBackendConnectionTimeout {
+		seelog.Warnf("Invalid value for ECS_BACKEND_CONNECTION_TIMEOUT, will be overridden with the "+
+			"default value: %s. Parsed value: %v, minimum value: %v.",
+			defaultBackendConnectionTimeout.String(), cfg.BackendConnectionTimeout, minimumBackendConnectionTimeout)
+		cfg.BackendConnectionTimeout = defaultBackendConnectionTimeout
 	}
 
 	// check the PollMetrics specific configurations
