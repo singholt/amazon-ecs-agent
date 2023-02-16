@@ -98,6 +98,7 @@ type ClientServer interface {
 	SetAnyRequestHandler(RequestHandler)
 	MakeRequest(input interface{}) error
 	WriteMessage(input []byte) error
+	WriteCloseMessage(input []byte) error
 	Connect() error
 	IsConnected() bool
 	SetConnection(conn wsconn.WebsocketConn)
@@ -368,6 +369,22 @@ func (cs *ClientServerImpl) WriteMessage(send []byte) error {
 	}
 
 	return cs.conn.WriteMessage(websocket.TextMessage, send)
+}
+
+// WriteCloseMessage wraps the low level websocket write control method with a lock,
+// and with message type as websocket.CloseMessage
+func (cs *ClientServerImpl) WriteCloseMessage(send []byte) error {
+	cs.writeLock.Lock()
+	defer cs.writeLock.Unlock()
+
+	// This is just future proofing. Ignore the error as the gorilla websocket
+	// library returns 'nil' anyway for SetWriteDeadline
+	// https://github.com/gorilla/websocket/blob/4201258b820c74ac8e6922fc9e6b52f71fe46f8d/conn.go#L761
+	if err := cs.conn.SetWriteDeadline(time.Now().Add(cs.RWTimeout)); err != nil {
+		seelog.Warnf("Unable to set write deadline for websocket connection: %v for %s", err, cs.URL)
+	}
+
+	return cs.conn.WriteControl(websocket.CloseMessage, send, time.Now().Add(time.Second))
 }
 
 // ConsumeMessages reads messages from the websocket connection and handles read

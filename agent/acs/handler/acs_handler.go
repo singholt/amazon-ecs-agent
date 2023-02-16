@@ -39,8 +39,10 @@ import (
 	"github.com/aws/amazon-ecs-agent/agent/utils/ttime"
 	"github.com/aws/amazon-ecs-agent/agent/version"
 	"github.com/aws/amazon-ecs-agent/agent/wsclient"
+
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/cihub/seelog"
+	"github.com/gorilla/websocket"
 )
 
 const (
@@ -53,6 +55,10 @@ const (
 	wsRWTimeout = 2*heartbeatTimeout + heartbeatJitter
 
 	inactiveInstanceReconnectDelay = 1 * time.Hour
+
+	// connectionTime is the maximum time after which agent closes its websocket connection with ACS
+	connectionTime   = 2 * time.Minute
+	connectionJitter = 2 * time.Minute
 
 	connectionBackoffMin        = 250 * time.Millisecond
 	connectionBackoffMax        = 2 * time.Minute
@@ -100,6 +106,8 @@ type session struct {
 	doctor                          *doctor.Doctor
 	_heartbeatTimeout               time.Duration
 	_heartbeatJitter                time.Duration
+	connectionTime                  time.Duration
+	connectionJitter                time.Duration
 	_inactiveInstanceReconnectDelay time.Duration
 }
 
@@ -107,7 +115,7 @@ type session struct {
 // a session with ACS. This interface is intended to define methods
 // that create resources used to establish the connection to ACS
 // It is confined to just the createACSClient() method for now. It can be
-// extended to include the acsWsURL() and newDisconnectionTimer() methods
+// extended to include the acsWsURL() and newHeartbeatTimer() methods
 // when needed
 // The goal is to make it easier to test and inject dependencies
 type sessionResources interface {
@@ -182,6 +190,8 @@ func NewSession(
 		doctor:                          doctor,
 		_heartbeatTimeout:               heartbeatTimeout,
 		_heartbeatJitter:                heartbeatJitter,
+		connectionTime:                  connectionTime,
+		connectionJitter:                connectionJitter,
 		_inactiveInstanceReconnectDelay: inactiveInstanceReconnectDelay,
 	}
 }
@@ -224,7 +234,7 @@ func (acsSession *session) Start() error {
 				}
 			}
 			if shouldReconnectWithoutBackoff(acsError) {
-				// If ACS closed the connection, there's no need to backoff,
+				// If ACS or the agent itself closed the connection, there's no need to backoff,
 				// reconnect immediately
 				seelog.Infof("ACS Websocket connection closed for a valid reason: %v", acsError)
 				acsSession.backoff.Reset()
@@ -360,11 +370,20 @@ func (acsSession *session) startACSSession(client wsclient.ClientServer) error {
 	}
 
 	seelog.Info("Connected to ACS endpoint")
-	// Start inactivity timer for closing the connection
-	timer := newDisconnectionTimer(client, acsSession.heartbeatTimeout(), acsSession.heartbeatJitter())
-	// Any message from the server resets the disconnect timeout
-	client.SetAnyRequestHandler(anyMessageHandler(timer, client))
-	defer timer.Stop()
+	// Start a connection timer; agent will close its ACS connection after this timer expires
+	expiresAt := retry.AddJitter(acsSession.connectionTime, acsSession.connectionJitter)
+	seelog.Infof("ACS websocket connection will expire after %v minutes", expiresAt.Minutes())
+	closeWS := make(chan bool)
+	connectionTimer := time.AfterFunc(expiresAt, func() {
+		closeWS <- true
+	})
+	defer connectionTimer.Stop()
+
+	// Start heartbeat timer for closing the connection
+	heartbeatTimer := newHeartbeatTimer(client, acsSession.heartbeatTimeout(), acsSession.heartbeatJitter())
+	// Any message from the server resets the heartbeat timer
+	client.SetAnyRequestHandler(anyMessageHandler(heartbeatTimer, client))
+	defer heartbeatTimer.Stop()
 
 	acsSession.resources.connectedToACS()
 
@@ -385,6 +404,13 @@ func (acsSession *session) startACSSession(client wsclient.ClientServer) error {
 
 	for {
 		select {
+		case <-closeWS:
+			seelog.Infof("Closing ACS websocket connection after %v minutes", expiresAt.Minutes())
+			closeMessage := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "please close my connection to ACS")
+			err := client.WriteCloseMessage(closeMessage)
+			if err != nil {
+				seelog.Errorf("error writing closure message, err: %v", err)
+			}
 		case <-acsSession.ctx.Done():
 			// Stop receiving and sending messages from and to ACS when
 			// the context received from the main function is canceled
@@ -478,9 +504,9 @@ func acsWsURL(endpoint, cluster, containerInstanceArn string, taskEngine engine.
 	return acsURL + "?" + query.Encode()
 }
 
-// newDisconnectionTimer creates a new time object, with a callback to
+// newHeartbeatTimer creates a new time object, with a callback to
 // disconnect from ACS on inactivity
-func newDisconnectionTimer(client wsclient.ClientServer, timeout time.Duration, jitter time.Duration) ttime.Timer {
+func newHeartbeatTimer(client wsclient.ClientServer, timeout time.Duration, jitter time.Duration) ttime.Timer {
 	timer := time.AfterFunc(retry.AddJitter(timeout, jitter), func() {
 		seelog.Warn("ACS Connection hasn't had any activity for too long; closing connection")
 		if err := client.Close(); err != nil {
