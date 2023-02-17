@@ -58,7 +58,7 @@ const (
 
 	// connectionTime is the maximum time after which agent closes its websocket connection with ACS
 	connectionTime   = 2 * time.Minute
-	connectionJitter = 2 * time.Minute
+	connectionJitter = 0 * time.Minute
 
 	connectionBackoffMin        = 250 * time.Millisecond
 	connectionBackoffMax        = 2 * time.Minute
