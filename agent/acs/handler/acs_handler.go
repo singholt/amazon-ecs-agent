@@ -56,8 +56,8 @@ const (
 	inactiveInstanceReconnectDelay = 1 * time.Hour
 
 	// connectionTime is the maximum time after which agent closes its connection to ACS
-	connectionTime   = 15 * time.Minute
-	connectionJitter = 30 * time.Minute
+	connectionTime   = 1 * time.Minute
+	connectionJitter = 0 * time.Minute
 
 	connectionBackoffMin        = 250 * time.Millisecond
 	connectionBackoffMax        = 2 * time.Minute
