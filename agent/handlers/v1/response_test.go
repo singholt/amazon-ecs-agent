@@ -19,6 +19,7 @@ package v1
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
 	apicontainer "github.com/aws/amazon-ecs-agent/agent/api/container"
 	apitask "github.com/aws/amazon-ecs-agent/agent/api/task"
@@ -35,6 +36,8 @@ const (
 	version        = "1"
 	containerID    = "cid"
 	containerName  = "sleepy"
+	imageName      = "busybox"
+	imageID        = "busyboxID"
 	eniIPv4Address = "10.0.0.2"
 	volName        = "volume1"
 	volSource      = "/var/lib/volume1"
@@ -42,6 +45,7 @@ const (
 )
 
 func TestTaskResponse(t *testing.T) {
+	createdAt, startedAt := time.Now(), time.Now()
 	expectedTaskResponseMap := map[string]interface{}{
 		"Arn":           "t1",
 		"DesiredStatus": "RUNNING",
@@ -53,6 +57,10 @@ func TestTaskResponse(t *testing.T) {
 				"DockerId":   "cid",
 				"DockerName": "sleepy",
 				"Name":       "sleepy",
+				"Image":      "busybox",
+				"ImageID":    "busyboxID",
+				"CreatedAt":  createdAt.UTC().String(),
+				"StartedAt":  startedAt.UTC().String(),
 				"Ports": []interface{}{
 					map[string]interface{}{
 						// The number should be float here, because when we unmarshal
@@ -98,7 +106,9 @@ func TestTaskResponse(t *testing.T) {
 	}
 
 	container := &apicontainer.Container{
-		Name: containerName,
+		Name:    containerName,
+		Image:   imageName,
+		ImageID: imageID,
 		Ports: []apicontainer.PortBinding{
 			{
 				ContainerPort: 80,
@@ -113,6 +123,9 @@ func TestTaskResponse(t *testing.T) {
 			},
 		},
 	}
+
+	container.SetCreatedAt(createdAt)
+	container.SetStartedAt(startedAt)
 
 	containerNameToDockerContainer := map[string]*apicontainer.DockerContainer{
 		taskARN: {
@@ -135,10 +148,15 @@ func TestTaskResponse(t *testing.T) {
 }
 
 func TestContainerResponse(t *testing.T) {
+	createdAt, startedAt := time.Now(), time.Now()
 	expectedContainerResponseMap := map[string]interface{}{
 		"DockerId":   "cid",
 		"DockerName": "sleepy",
 		"Name":       "sleepy",
+		"Image":      "busybox",
+		"ImageID":    "busyboxID",
+		"CreatedAt":  createdAt.UTC().String(),
+		"StartedAt":  startedAt.UTC().String(),
 		"Ports": []interface{}{
 			map[string]interface{}{
 				"ContainerPort": float64(80),
@@ -162,7 +180,9 @@ func TestContainerResponse(t *testing.T) {
 	}
 
 	container := &apicontainer.Container{
-		Name: containerName,
+		Name:    containerName,
+		Image:   imageName,
+		ImageID: imageID,
 		Ports: []apicontainer.PortBinding{
 			{
 				ContainerPort: 80,
@@ -177,6 +197,9 @@ func TestContainerResponse(t *testing.T) {
 			},
 		},
 	}
+
+	container.SetCreatedAt(createdAt)
+	container.SetStartedAt(startedAt)
 
 	dockerContainer := &apicontainer.DockerContainer{
 		DockerID:   containerID,

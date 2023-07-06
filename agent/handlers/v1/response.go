@@ -14,6 +14,8 @@
 package v1
 
 import (
+	"time"
+
 	apicontainer "github.com/aws/amazon-ecs-agent/agent/api/container"
 	apitask "github.com/aws/amazon-ecs-agent/agent/api/task"
 	"github.com/aws/amazon-ecs-agent/agent/engine/dockerstate"
@@ -49,6 +51,10 @@ type ContainerResponse struct {
 	DockerID   string                        `json:"DockerId"`
 	DockerName string                        `json:"DockerName"`
 	Name       string                        `json:"Name"`
+	Image      string                        `json:"Image"`
+	ImageID    string                        `json:"ImageID"`
+	CreatedAt  *time.Time                    `json:"CreatedAt,omitempty"`
+	StartedAt  *time.Time                    `json:"StartedAt,omitempty"`
 	Ports      []tmdsresponse.PortResponse   `json:"Ports,omitempty"`
 	Networks   []tmdsresponse.Network        `json:"Networks,omitempty"`
 	Volumes    []tmdsresponse.VolumeResponse `json:"Volumes,omitempty"`
@@ -91,6 +97,8 @@ func NewContainerResponse(dockerContainer *apicontainer.DockerContainer, eni *ap
 		Name:       container.Name,
 		DockerID:   dockerContainer.DockerID,
 		DockerName: dockerContainer.DockerName,
+		Image:      dockerContainer.Container.Image,
+		ImageID:    dockerContainer.Container.ImageID,
 	}
 
 	resp.Ports = NewPortBindingsResponse(dockerContainer, eni)
@@ -105,6 +113,16 @@ func NewContainerResponse(dockerContainer *apicontainer.DockerContainer, eni *ap
 			},
 		}
 	}
+
+	if createdAt := container.GetCreatedAt(); !createdAt.IsZero() {
+		createdAt = createdAt.UTC()
+		resp.CreatedAt = &createdAt
+	}
+	if startedAt := container.GetStartedAt(); !startedAt.IsZero() {
+		startedAt = startedAt.UTC()
+		resp.StartedAt = &startedAt
+	}
+
 	return resp
 }
 
