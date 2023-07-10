@@ -232,6 +232,20 @@
       "type":"list",
       "member":{"shape":"AttachmentProperty"}
     },
+    "Attribute":{
+      "type":"structure",
+      "required":["name"],
+      "members":{
+        "name":{"shape":"String"},
+        "value":{"shape":"String"},
+        "targetType":{"shape":"TargetType"},
+        "targetId":{"shape":"String"}
+      }
+    },
+    "Attributes":{
+      "type":"list",
+      "member":{"shape":"Attribute"}
+    },
     "AuthStrategy":{
       "type":"string",
       "enum":["ExecutionRole"]
@@ -820,10 +834,15 @@
       "key":{"shape":"String"},
       "value":{"shape":"String"}
     },
+    "TargetType":{
+      "type":"string",
+      "enum":["task"]
+    },
     "Task":{
       "type":"structure",
       "members":{
         "arn":{"shape":"String"},
+        "attributes":{"shape":"Attributes"},
         "taskClusterArn":{"shape":"String"},
         "containers":{"shape":"ContainerList"},
         "desiredStatus":{"shape":"String"},
