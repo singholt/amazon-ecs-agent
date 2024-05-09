@@ -384,14 +384,9 @@ func (agent *manager) setLoadedAppnetVerion(appnetInterfaceVersion string) {
 // of AppNet versions from highest to lowest version when loading AppNet image
 func (agent *manager) LoadImage(ctx context.Context, _ *config.Config, dockerClient dockerapi.DockerClient) (*types.ImageInspect, error) {
 	var loadErr error
-	for _, supportedAppnetInterfaceVersion := range getSupportedAppnetInterfaceVersions() {
+
+	for _, supportedAppnetInterfaceVersion := range FindAppnetImageVersions() {
 		agentContainerTarballPath := fmt.Sprintf(defaultAgentContainerTarballPathFormat, supportedAppnetInterfaceVersion)
-		if _, err := os.Stat(agentContainerTarballPath); err != nil {
-			logger.Warn(fmt.Sprintf("AppNet agent container tarball unavailable: %s", agentContainerTarballPath), logger.Fields{
-				field.Error: err,
-			})
-			continue
-		}
 		logger.Debug(fmt.Sprintf("Loading Appnet agent container tarball: %s", agentContainerTarballPath))
 		if loadErr = loader.LoadFromFile(ctx, agentContainerTarballPath, dockerClient); loadErr != nil {
 			logger.Warn(fmt.Sprintf("Unable to load Appnet agent container tarball: %s", agentContainerTarballPath),

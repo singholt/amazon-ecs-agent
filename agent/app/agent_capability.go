@@ -23,6 +23,7 @@ import (
 	"github.com/aws/amazon-ecs-agent/agent/config"
 	"github.com/aws/amazon-ecs-agent/agent/dockerclient"
 	dm "github.com/aws/amazon-ecs-agent/agent/engine/daemonmanager"
+	"github.com/aws/amazon-ecs-agent/agent/engine/serviceconnect"
 	"github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/model/ecs"
 	"github.com/aws/amazon-ecs-agent/ecs-agent/logger"
 	"github.com/aws/amazon-ecs-agent/ecs-agent/logger/field"
@@ -474,29 +475,39 @@ func (agent *ecsAgent) appendExecCapabilities(capabilities []*ecs.Attribute) ([]
 	return appendNameOnlyAttribute(capabilities, attributePrefix+capabilityExec), nil
 }
 
-func (agent *ecsAgent) appendServiceConnectCapabilities(capabilities []*ecs.Attribute) []*ecs.Attribute {
+func (agent *ecsAgent) loadAppnetImage() {
 	if loaded, _ := agent.serviceconnectManager.IsLoaded(agent.dockerClient); !loaded {
 		_, err := agent.serviceconnectManager.LoadImage(agent.ctx, agent.cfg, agent.dockerClient)
 		if err != nil {
-			logger.Error("ServiceConnect Capability: Failed to load appnet Agent container. This container instance will not be able to support ServiceConnect tasks",
+			logger.Error("ServiceConnect: Failed to load appnet Agent container. This container instance will not be able to support ServiceConnect tasks",
 				logger.Fields{
 					field.Error: err,
 				},
 			)
-			return capabilities
 		}
 	}
-	loadedVer, _ := agent.serviceconnectManager.GetLoadedAppnetVersion()
-	supportedAppnetInterfaceVerToCapabilities, _ := agent.serviceconnectManager.GetCapabilitiesForAppnetInterfaceVersion(loadedVer)
-	if supportedAppnetInterfaceVerToCapabilities == nil {
-		logger.Warn("ServiceConnect Capability: No service connect capabilities were found for Appnet version:", logger.Fields{
-			field.Image: loadedVer,
-		},
-		)
+}
+
+func (agent *ecsAgent) appendServiceConnectCapabilities(capabilities []*ecs.Attribute) []*ecs.Attribute {
+	appnetImageVersions := serviceconnect.FindAppnetImageVersions()
+	for _, appnetImageVersion := range appnetImageVersions {
+		supportedAppnetInterfaceVerToCapabilities, _ := agent.serviceconnectManager.GetCapabilitiesForAppnetInterfaceVersion(appnetImageVersion)
+		if supportedAppnetInterfaceVerToCapabilities == nil {
+			logger.Warn("ServiceConnect Capability: No service connect capabilities were found for Appnet version:", logger.Fields{
+				field.Image: appnetImageVersion,
+			})
+		}
+		logger.Info("Found Appnet version, adding associated capabilities",
+			logger.Fields{
+				"appnetImageVersion": appnetImageVersion,
+				"capabilities":       supportedAppnetInterfaceVerToCapabilities,
+			})
+		for _, serviceConnectCapability := range supportedAppnetInterfaceVerToCapabilities {
+			capabilities = appendNameOnlyAttribute(capabilities, serviceConnectCapability)
+		}
 	}
-	for _, serviceConnectCapability := range supportedAppnetInterfaceVerToCapabilities {
-		capabilities = appendNameOnlyAttribute(capabilities, serviceConnectCapability)
-	}
+	go agent.loadAppnetImage()
+
 	return capabilities
 }
 

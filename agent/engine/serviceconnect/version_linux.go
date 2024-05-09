@@ -14,6 +14,8 @@
 package serviceconnect
 
 import (
+	"fmt"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -34,6 +36,24 @@ var (
 		},
 	}
 )
+
+// FindAppnetImageVersions finds all supported appnet versions, checks if that
+// appnet version is present as a tarball on the instance, and returns a list
+// of every version it finds from highest to lowest version.
+func FindAppnetImageVersions() []string {
+	supportedVersions := []string{}
+	for _, supportedAppnetInterfaceVersion := range getSupportedAppnetInterfaceVersions() {
+		agentContainerTarballPath := fmt.Sprintf(defaultAgentContainerTarballPathFormat, supportedAppnetInterfaceVersion)
+		if _, err := os.Stat(agentContainerTarballPath); err != nil {
+			logger.Warn(fmt.Sprintf("AppNet agent container tarball unavailable: %s", agentContainerTarballPath), logger.Fields{
+				field.Error: err,
+			})
+			continue
+		}
+		supportedVersions = append(supportedVersions, supportedAppnetInterfaceVersion)
+	}
+	return supportedVersions
+}
 
 // getSupportedAppnetInterfaceVersions returns the all the supported AppNet interface versions
 // by ECS Agent from highest to lowest version
