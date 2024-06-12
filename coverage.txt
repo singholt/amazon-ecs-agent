@@ -1,265 +1,264 @@
-2024-06-12T16:04:13.7255255Z cd agent && GO111MODULE=on GOEXPERIMENT=nocoverageredesign /opt/hostedtoolcache/go/1.22.3/x64/bin/go test -count=1 -race -tags unit -mod vendor -coverprofile ../cover.out -timeout=120s ./... && cd ..
-2024-06-12T16:05:06.8874713Z ?   	github.com/aws/amazon-ecs-agent/agent	[no test files]
-2024-06-12T16:05:08.5343319Z ?   	github.com/aws/amazon-ecs-agent/agent/acs/updater/mock	[no test files]
-2024-06-12T16:05:16.0430789Z ?   	github.com/aws/amazon-ecs-agent/agent/app/args	[no test files]
-2024-06-12T16:05:16.0432402Z ?   	github.com/aws/amazon-ecs-agent/agent/app/factory	[no test files]
-2024-06-12T16:05:16.0498684Z ?   	github.com/aws/amazon-ecs-agent/agent/app/factory/mocks	[no test files]
-2024-06-12T16:05:16.0500265Z ?   	github.com/aws/amazon-ecs-agent/agent/app/mocks	[no test files]
-2024-06-12T16:05:16.4349910Z ok  	github.com/aws/amazon-ecs-agent/agent/acs/session	8.246s	coverage: 76.2% of statements
-2024-06-12T16:05:16.4352157Z ok  	github.com/aws/amazon-ecs-agent/agent/acs/updater	1.121s	coverage: 86.9% of statements
-2024-06-12T16:05:16.4354023Z ok  	github.com/aws/amazon-ecs-agent/agent/api	1.041s	coverage: 57.8% of statements
-2024-06-12T16:05:16.4355975Z ok  	github.com/aws/amazon-ecs-agent/agent/api/appmesh	1.021s	coverage: 92.6% of statements
-2024-06-12T16:05:16.4358027Z ok  	github.com/aws/amazon-ecs-agent/agent/api/container	1.058s	coverage: 59.6% of statements
-2024-06-12T16:05:16.4360983Z ok  	github.com/aws/amazon-ecs-agent/agent/api/errormessages	1.016s	coverage: 97.5% of statements
-2024-06-12T16:05:16.4363456Z ok  	github.com/aws/amazon-ecs-agent/agent/api/serviceconnect	1.023s	coverage: 86.9% of statements
-2024-06-12T16:05:16.4365721Z ok  	github.com/aws/amazon-ecs-agent/agent/api/task	1.128s	coverage: 80.4% of statements
-2024-06-12T16:05:16.4367811Z ok  	github.com/aws/amazon-ecs-agent/agent/api/testutils	1.054s	coverage: 83.1% of statements
-2024-06-12T16:05:16.5047820Z ?   	github.com/aws/amazon-ecs-agent/agent/asm/factory	[no test files]
-2024-06-12T16:05:16.5050076Z ?   	github.com/aws/amazon-ecs-agent/agent/asm/factory/mocks	[no test files]
-2024-06-12T16:05:16.5051808Z ?   	github.com/aws/amazon-ecs-agent/agent/asm/mocks	[no test files]
-2024-06-12T16:05:17.8005369Z ?   	github.com/aws/amazon-ecs-agent/agent/containermetadata/mocks	[no test files]
-2024-06-12T16:05:18.9642823Z ?   	github.com/aws/amazon-ecs-agent/agent/data/models	[no test files]
-2024-06-12T16:05:22.2256859Z ?   	github.com/aws/amazon-ecs-agent/agent/dockerclient/dockerapi/mocks	[no test files]
-2024-06-12T16:05:22.3157740Z ?   	github.com/aws/amazon-ecs-agent/agent/dockerclient/sdkclient	[no test files]
-2024-06-12T16:05:22.3160114Z ?   	github.com/aws/amazon-ecs-agent/agent/dockerclient/sdkclient/mocks	[no test files]
-2024-06-12T16:05:23.3863084Z ?   	github.com/aws/amazon-ecs-agent/agent/dockerclient/sdkclientfactory/mocks	[no test files]
-2024-06-12T16:05:28.5636650Z ?   	github.com/aws/amazon-ecs-agent/agent/ecr/mocks	[no test files]
-2024-06-12T16:05:28.5885612Z ?   	github.com/aws/amazon-ecs-agent/agent/ecr/model	[no test files]
-2024-06-12T16:05:28.5887794Z ?   	github.com/aws/amazon-ecs-agent/agent/ecr/model/ecr	[no test files]
-2024-06-12T16:05:30.0870471Z ?   	github.com/aws/amazon-ecs-agent/agent/ecscni/mocks	[no test files]
-2024-06-12T16:05:30.1444633Z ?   	github.com/aws/amazon-ecs-agent/agent/ecscni/mocks_cnitypes	[no test files]
-2024-06-12T16:05:30.1446638Z ?   	github.com/aws/amazon-ecs-agent/agent/ecscni/mocks_libcni	[no test files]
-2024-06-12T16:05:37.1536016Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/daemonmanager/mock	[no test files]
-2024-06-12T16:05:40.5831453Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/dockerstate/mocks	[no test files]
-2024-06-12T16:05:43.8125078Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/execcmd/mocks	[no test files]
-2024-06-12T16:05:43.8126828Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/image	[no test files]
-2024-06-12T16:05:43.8128146Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/mocks	[no test files]
-2024-06-12T16:05:45.7167982Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/serviceconnect/mock	[no test files]
-2024-06-12T16:05:46.0164024Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/testutils	[no test files]
-2024-06-12T16:05:46.0171268Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/netlinkwrapper	[no test files]
-2024-06-12T16:05:46.0682077Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/netlinkwrapper/mocks	[no test files]
-2024-06-12T16:05:46.9096511Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/netwrapper	[no test files]
-2024-06-12T16:05:46.9486010Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/netwrapper/mocks	[no test files]
-2024-06-12T16:05:46.9488105Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/pause	[no test files]
-2024-06-12T16:05:46.9489903Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/udevwrapper	[no test files]
-2024-06-12T16:05:46.9491657Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/udevwrapper/mocks	[no test files]
-2024-06-12T16:05:49.2187525Z ok  	github.com/aws/amazon-ecs-agent/agent/app	33.163s	coverage: 76.6% of statements
-2024-06-12T16:05:49.2189094Z ok  	github.com/aws/amazon-ecs-agent/agent/asm	1.024s	coverage: 90.4% of statements
-2024-06-12T16:05:49.2190817Z ok  	github.com/aws/amazon-ecs-agent/agent/config	1.228s	coverage: 91.4% of statements
-2024-06-12T16:05:49.2249413Z ok  	github.com/aws/amazon-ecs-agent/agent/containermetadata	1.047s	coverage: 93.8% of statements
-2024-06-12T16:05:49.2252157Z ok  	github.com/aws/amazon-ecs-agent/agent/data	1.348s	coverage: 70.7% of statements
-2024-06-12T16:05:49.2255687Z ok  	github.com/aws/amazon-ecs-agent/agent/data/transformationfunctions	1.035s	coverage: 17.4% of statements
-2024-06-12T16:05:49.2258549Z ok  	github.com/aws/amazon-ecs-agent/agent/dockerclient	1.014s	coverage: 91.9% of statements
-2024-06-12T16:05:49.2261336Z ok  	github.com/aws/amazon-ecs-agent/agent/dockerclient/dockerapi	5.448s	coverage: 78.0% of statements
-2024-06-12T16:05:49.2264385Z ok  	github.com/aws/amazon-ecs-agent/agent/dockerclient/dockerauth	1.060s	coverage: 95.8% of statements
-2024-06-12T16:05:49.2266342Z ok  	github.com/aws/amazon-ecs-agent/agent/dockerclient/sdkclientfactory	1.040s	coverage: 72.3% of statements
-2024-06-12T16:05:49.2268185Z ok  	github.com/aws/amazon-ecs-agent/agent/doctor	1.077s	coverage: 68.8% of statements
-2024-06-12T16:05:49.2269973Z ok  	github.com/aws/amazon-ecs-agent/agent/doctor/statustracker	1.019s	coverage: 96.3% of statements
-2024-06-12T16:05:49.2271620Z ok  	github.com/aws/amazon-ecs-agent/agent/ebs	3.108s	coverage: 84.8% of statements
-2024-06-12T16:05:49.2273225Z ok  	github.com/aws/amazon-ecs-agent/agent/ecr	1.092s	coverage: 52.0% of statements
-2024-06-12T16:05:49.2274593Z ok  	github.com/aws/amazon-ecs-agent/agent/ecscni	1.348s	coverage: 73.8% of statements
-2024-06-12T16:05:50.2493631Z ?   	github.com/aws/amazon-ecs-agent/agent/fsx/factory	[no test files]
-2024-06-12T16:05:50.2714853Z ?   	github.com/aws/amazon-ecs-agent/agent/fsx/factory/mocks	[no test files]
-2024-06-12T16:05:50.2715965Z ?   	github.com/aws/amazon-ecs-agent/agent/fsx/mocks	[no test files]
-2024-06-12T16:05:51.1356613Z ?   	github.com/aws/amazon-ecs-agent/agent/gpu/mocks	[no test files]
-2024-06-12T16:05:53.4431558Z ?   	github.com/aws/amazon-ecs-agent/agent/handlers/mocks	[no test files]
-2024-06-12T16:05:53.4850787Z ?   	github.com/aws/amazon-ecs-agent/agent/handlers/mocks/http	[no test files]
-2024-06-12T16:05:53.4852603Z ?   	github.com/aws/amazon-ecs-agent/agent/handlers/utils	[no test files]
-2024-06-12T16:05:57.9613048Z ?   	github.com/aws/amazon-ecs-agent/agent/logger/audit/mocks	[no test files]
-2024-06-12T16:05:59.0563070Z ?   	github.com/aws/amazon-ecs-agent/agent/s3/factory	[no test files]
-2024-06-12T16:05:59.0564727Z ?   	github.com/aws/amazon-ecs-agent/agent/s3/factory/mocks	[no test files]
-2024-06-12T16:05:59.0570314Z ?   	github.com/aws/amazon-ecs-agent/agent/s3/mocks	[no test files]
-2024-06-12T16:05:59.0572438Z ?   	github.com/aws/amazon-ecs-agent/agent/s3/mocks/s3manager	[no test files]
-2024-06-12T16:06:00.4076973Z ?   	github.com/aws/amazon-ecs-agent/agent/sighandlers/exitcodes	[no test files]
-2024-06-12T16:06:01.5316590Z ?   	github.com/aws/amazon-ecs-agent/agent/ssm/factory	[no test files]
-2024-06-12T16:06:01.5318163Z ?   	github.com/aws/amazon-ecs-agent/agent/ssm/factory/mocks	[no test files]
-2024-06-12T16:06:01.5319480Z ?   	github.com/aws/amazon-ecs-agent/agent/ssm/mocks	[no test files]
-2024-06-12T16:06:01.5320789Z ?   	github.com/aws/amazon-ecs-agent/agent/statechange	[no test files]
-2024-06-12T16:06:02.9596717Z ?   	github.com/aws/amazon-ecs-agent/agent/statemanager/dependencies	[no test files]
-2024-06-12T16:06:02.9599437Z ?   	github.com/aws/amazon-ecs-agent/agent/statemanager/mocks	[no test files]
-2024-06-12T16:06:05.0309137Z ?   	github.com/aws/amazon-ecs-agent/agent/stats/mock	[no test files]
-2024-06-12T16:06:05.7168599Z ?   	github.com/aws/amazon-ecs-agent/agent/stats/resolver	[no test files]
-2024-06-12T16:06:05.7170963Z ?   	github.com/aws/amazon-ecs-agent/agent/stats/resolver/mock	[no test files]
-2024-06-12T16:06:05.7173007Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource	[no test files]
-2024-06-12T16:06:09.6647495Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup/control/factory	[no test files]
-2024-06-12T16:06:09.6649517Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup/control/factory/mock	[no test files]
-2024-06-12T16:06:09.6650961Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup/control/factory/mock_factory	[no test files]
-2024-06-12T16:06:09.6652758Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup/control/mock_control	[no test files]
-2024-06-12T16:06:16.0294132Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/mocks	[no test files]
-2024-06-12T16:06:17.0356803Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/status	[no test files]
-2024-06-12T16:06:20.1747271Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/bufiowrapper	[no test files]
-2024-06-12T16:06:20.1748477Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/bufiowrapper/mocks	[no test files]
-2024-06-12T16:06:20.1749379Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/ioutilwrapper	[no test files]
-2024-06-12T16:06:20.1750253Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/ioutilwrapper/mocks	[no test files]
-2024-06-12T16:06:21.8608962Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/loader/mocks	[no test files]
-2024-06-12T16:06:21.8610452Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/mobypkgwrapper	[no test files]
-2024-06-12T16:06:21.8612036Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/mobypkgwrapper/mocks	[no test files]
-2024-06-12T16:06:21.8613427Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/mocks	[no test files]
-2024-06-12T16:06:21.8614304Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/nswrapper	[no test files]
-2024-06-12T16:06:21.8615212Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/nswrapper/mocks	[no test files]
-2024-06-12T16:06:21.8616194Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/oswrapper	[no test files]
-2024-06-12T16:06:21.8617094Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/oswrapper/mocks	[no test files]
-2024-06-12T16:06:22.1663727Z ?   	github.com/aws/amazon-ecs-agent/agent/version	[no test files]
-2024-06-12T16:06:22.1992006Z ?   	github.com/aws/amazon-ecs-agent/agent/version/gen	[no test files]
-2024-06-12T16:07:24.0013796Z ok  	github.com/aws/amazon-ecs-agent/agent/engine	106.836s	coverage: 83.9% of statements
-2024-06-12T16:07:24.0015818Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/daemonmanager	1.084s	coverage: 56.9% of statements
-2024-06-12T16:07:24.0019104Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/dependencygraph	1.135s	coverage: 88.5% of statements
-2024-06-12T16:07:24.0021242Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/dockerstate	1.106s	coverage: 85.6% of statements
-2024-06-12T16:07:24.0023417Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/dockerstate/testutils	1.061s	coverage: 72.7% of statements
-2024-06-12T16:07:24.0026685Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/execcmd	1.119s	coverage: 92.9% of statements
-2024-06-12T16:07:24.0028640Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/serviceconnect	1.126s	coverage: 57.9% of statements
-2024-06-12T16:07:24.0030471Z ok  	github.com/aws/amazon-ecs-agent/agent/eni/networkutils	1.052s	coverage: 100.0% of statements
-2024-06-12T16:07:24.0032142Z ok  	github.com/aws/amazon-ecs-agent/agent/eni/watcher	1.318s	coverage: 72.6% of statements
-2024-06-12T16:07:24.0038105Z ok  	github.com/aws/amazon-ecs-agent/agent/eventhandler	2.479s	coverage: 83.7% of statements
-2024-06-12T16:07:24.0042586Z ok  	github.com/aws/amazon-ecs-agent/agent/fsx	1.017s	coverage: 100.0% of statements
-2024-06-12T16:07:24.0044268Z ok  	github.com/aws/amazon-ecs-agent/agent/gpu	1.015s	coverage: 74.5% of statements
-2024-06-12T16:07:24.0045776Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers	1.578s	coverage: 66.7% of statements
-2024-06-12T16:07:24.0047621Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers/agentapi/taskprotection	1.019s	coverage: 100.0% of statements
-2024-06-12T16:07:24.0086942Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers/v1	1.032s	coverage: 41.2% of statements
-2024-06-12T16:07:24.0088829Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers/v2	1.065s	coverage: 52.1% of statements
-2024-06-12T16:07:24.0090579Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers/v3	1.046s	coverage: 5.6% of statements
-2024-06-12T16:07:24.0092194Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers/v4	1.047s	coverage: 15.3% of statements
-2024-06-12T16:07:24.0094411Z ok  	github.com/aws/amazon-ecs-agent/agent/logger/audit	1.019s	coverage: 73.5% of statements
-2024-06-12T16:07:24.0096109Z ok  	github.com/aws/amazon-ecs-agent/agent/metrics	4.025s	coverage: 73.6% of statements
-2024-06-12T16:07:24.0097700Z ok  	github.com/aws/amazon-ecs-agent/agent/s3	1.022s	coverage: 95.0% of statements
-2024-06-12T16:07:24.0099448Z ok  	github.com/aws/amazon-ecs-agent/agent/sighandlers	1.111s	coverage: 53.7% of statements
-2024-06-12T16:07:24.0100989Z ok  	github.com/aws/amazon-ecs-agent/agent/ssm	1.015s	coverage: 90.5% of statements
-2024-06-12T16:07:24.0102571Z ok  	github.com/aws/amazon-ecs-agent/agent/statemanager	1.160s	coverage: 65.5% of statements
-2024-06-12T16:07:24.0104399Z ok  	github.com/aws/amazon-ecs-agent/agent/stats	52.212s	coverage: 80.8% of statements
-2024-06-12T16:07:24.0106112Z ok  	github.com/aws/amazon-ecs-agent/agent/stats/reporter	1.054s	coverage: 94.7% of statements
-2024-06-12T16:07:24.0107913Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/asmauth	1.031s	coverage: 63.7% of statements
-2024-06-12T16:07:24.0109961Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/asmsecret	1.038s	coverage: 73.6% of statements
-2024-06-12T16:07:24.0111850Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup	1.033s	coverage: 62.3% of statements
-2024-06-12T16:07:24.0113832Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup/control	1.019s	coverage: 37.9% of statements
-2024-06-12T16:07:24.0116008Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/credentialspec	1.040s	coverage: 56.6% of statements
-2024-06-12T16:07:24.0117922Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/envFiles	5.104s	coverage: 57.4% of statements
-2024-06-12T16:07:24.0119829Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/firelens	1.050s	coverage: 76.8% of statements
-2024-06-12T16:07:24.0122141Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/fsxwindowsfileserver	1.029s	coverage: 42.2% of statements
-2024-06-12T16:07:24.0124074Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/ssmsecret	1.036s	coverage: 74.2% of statements
-2024-06-12T16:07:24.0125904Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/types	1.037s	coverage: 49.2% of statements
-2024-06-12T16:07:24.0127795Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/volume	1.035s	coverage: 72.2% of statements
-2024-06-12T16:07:24.0129430Z ok  	github.com/aws/amazon-ecs-agent/agent/utils	2.086s	coverage: 75.7% of statements
-2024-06-12T16:07:24.0130951Z ok  	github.com/aws/amazon-ecs-agent/agent/utils/loader	1.031s	coverage: 96.0% of statements
-2024-06-12T16:07:24.0132718Z ok  	github.com/aws/amazon-ecs-agent/agent/utils/reference	1.024s	coverage: 91.9% of statements
-2024-06-12T16:07:24.2294226Z go tool cover -func cover.out > coverprofile.out
-2024-06-12T16:07:24.5595670Z cd ecs-agent && GO111MODULE=on GOEXPERIMENT=nocoverageredesign /opt/hostedtoolcache/go/1.22.3/x64/bin/go test -count=1 -race -tags unit -mod vendor -coverprofile ../cover.out -timeout=120s ./... && cd ..
-2024-06-12T16:07:29.6757446Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/acs/model	[no test files]
-2024-06-12T16:07:29.6759844Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/acs/model/ecsacs	[no test files]
-2024-06-12T16:07:30.7410942Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/acs/client	1.057s	coverage: 95.0% of statements
-2024-06-12T16:07:32.2473333Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/acs/session/mocks	[no test files]
-2024-06-12T16:07:32.2481994Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/acs/session/testconst	[no test files]
-2024-06-12T16:07:34.7654437Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/acs/session	2.510s	coverage: 90.2% of statements
-2024-06-12T16:07:35.6152724Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/appnet/mocks	[no test files]
-2024-06-12T16:07:36.6471569Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/attachment/resource/mocks	[no test files]
-2024-06-12T16:07:40.6582776Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/appnet	5.035s	coverage: 93.5% of statements
-2024-06-12T16:07:40.6585159Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/attachment	1.012s	coverage: 80.0% of statements
-2024-06-12T16:07:40.6586299Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/attachment/eni	1.388s	coverage: 73.5% of statements
-2024-06-12T16:07:40.6587448Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/attachment/resource	1.967s	coverage: 45.7% of statements
-2024-06-12T16:07:40.6588648Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/container/restart	1.016s	coverage: 89.3% of statements
-2024-06-12T16:07:40.6589751Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/container/status	1.015s	coverage: 68.1% of statements
-2024-06-12T16:07:40.6590707Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs	1.023s	coverage: 92.0% of statements
-2024-06-12T16:07:52.0221182Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/mocks	[no test files]
-2024-06-12T16:07:52.0222689Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/mocks/client	[no test files]
-2024-06-12T16:07:52.0224232Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/mocks/statechange	[no test files]
-2024-06-12T16:07:52.0309084Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/model	[no test files]
-2024-06-12T16:07:52.0311769Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/model/ecs	[no test files]
-2024-06-12T16:07:52.0313461Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/errors	[no test files]
-2024-06-12T16:07:52.3678494Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/async/mocks	[no test files]
-2024-06-12T16:07:52.3681015Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/config	[no test files]
-2024-06-12T16:07:52.3683361Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/config/mocks	[no test files]
-2024-06-12T16:07:53.5089466Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/client	1.479s	coverage: 88.0% of statements
-2024-06-12T16:07:53.5091559Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/task/status	1.011s	coverage: 46.8% of statements
-2024-06-12T16:07:53.6872414Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/credentials/mocks	[no test files]
-2024-06-12T16:07:53.7831190Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/async	1.414s	coverage: 96.6% of statements
-2024-06-12T16:07:53.7833623Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/credentials	1.015s	coverage: 100.0% of statements
-2024-06-12T16:07:54.7227205Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/credentials/instancecreds	1.025s	coverage: 100.0% of statements
-2024-06-12T16:07:56.1179095Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/credentials/providers	2.016s	coverage: 100.0% of statements
-2024-06-12T16:08:10.2122388Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/csiclient	1.027s	coverage: 1.4% of statements
-2024-06-12T16:08:10.3088968Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/csiclient/mocks	[no test files]
-2024-06-12T16:08:10.3358928Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/ec2/http	[no test files]
-2024-06-12T16:08:10.3632249Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/ec2/http/mocks	[no test files]
-2024-06-12T16:08:10.3633402Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/ec2/mocks	[no test files]
-2024-06-12T16:08:11.3308165Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/data	1.019s	coverage: 48.5% of statements
-2024-06-12T16:08:11.3312494Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/doctor	1.017s	coverage: 82.5% of statements
-2024-06-12T16:08:11.3537961Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/ec2	1.033s	coverage: 52.2% of statements
-2024-06-12T16:08:12.0445224Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/gmsacredclient/credentialsfetcher	[no test files]
-2024-06-12T16:08:12.0447852Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/httpclient/mock	[no test files]
-2024-06-12T16:08:12.6708687Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/eventstream	2.011s	coverage: 95.0% of statements
-2024-06-12T16:08:12.7097817Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/logger/audit	[no test files]
-2024-06-12T16:08:12.7352778Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/logger/audit/mocks	[no test files]
-2024-06-12T16:08:12.7354609Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/logger/audit/request	[no test files]
-2024-06-12T16:08:12.7355970Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/logger/field	[no test files]
-2024-06-12T16:08:12.7356998Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/logger/mocks	[no test files]
-2024-06-12T16:08:13.0876770Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/gmsacredclient	1.039s	coverage: 76.8% of statements
-2024-06-12T16:08:13.0878170Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/httpclient	1.014s	coverage: 75.0% of statements
-2024-06-12T16:08:13.1164188Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/metrics	[no test files]
-2024-06-12T16:08:13.1166427Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/metrics/mocks	[no test files]
-2024-06-12T16:08:13.5564618Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/logger	1.026s	coverage: 81.7% of statements
-2024-06-12T16:08:14.1462947Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/manageddaemon	1.021s	coverage: 67.4% of statements
-2024-06-12T16:08:14.4721190Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/modeltransformer	1.013s	coverage: 92.3% of statements
-2024-06-12T16:08:16.4945122Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/data	[no test files]
-2024-06-12T16:08:16.4947246Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/data/mocks	[no test files]
-2024-06-12T16:08:16.4950467Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/mocks	[no test files]
-2024-06-12T16:08:17.1141555Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/ecscni/mocks_ecscni	[no test files]
-2024-06-12T16:08:17.1143924Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/ecscni/mocks_libcni	[no test files]
-2024-06-12T16:08:17.1474792Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/ecscni/mocks_nsutil	[no test files]
-2024-06-12T16:08:17.1988909Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/mocks_libcni	[no test files]
-2024-06-12T16:08:17.5388198Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib	1.035s	coverage: 68.5% of statements
-2024-06-12T16:08:17.6262310Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/serviceconnect	[no test files]
-2024-06-12T16:08:17.8894161Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/appmesh	1.015s	coverage: 92.6% of statements
-2024-06-12T16:08:18.1391755Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/ecscni	1.018s	coverage: 13.5% of statements
-2024-06-12T16:08:18.9614551Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/platform/mocks	[no test files]
-2024-06-12T16:08:18.9710333Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/stats	[no test files]
-2024-06-12T16:08:19.0137990Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/networkinterface	1.378s	coverage: 11.2% of statements
-2024-06-12T16:08:19.0139591Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/status	1.008s	coverage: 66.7% of statements
-2024-06-12T16:08:19.3104367Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/tasknetworkconfig	1.017s	coverage: 67.5% of statements
-2024-06-12T16:08:19.8564372Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tcs/model	[no test files]
-2024-06-12T16:08:19.8565650Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tcs/model/ecstcs	[no test files]
-2024-06-12T16:08:19.9968453Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/platform	1.028s	coverage: 46.1% of statements
-2024-06-12T16:08:21.6387016Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/response	[no test files]
-2024-06-12T16:08:22.6417378Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/taskprotection/v1/types	[no test files]
-2024-06-12T16:08:23.6992596Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/v1	[no test files]
-2024-06-12T16:08:23.6993881Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/v2	[no test files]
-2024-06-12T16:08:25.1953316Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/v4/state/mocks	[no test files]
-2024-06-12T16:08:26.8168133Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tcs/client	7.058s	coverage: 76.3% of statements
-2024-06-12T16:08:26.8448888Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/arn	[no test files]
-2024-06-12T16:08:26.8450334Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/cipher	[no test files]
-2024-06-12T16:08:26.8472358Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/httpproxy	[no test files]
-2024-06-12T16:08:26.8474108Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/ioutilwrapper	[no test files]
-2024-06-12T16:08:26.8476244Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/ioutilwrapper/mocks	[no test files]
-2024-06-12T16:08:26.8477970Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/netlinkwrapper	[no test files]
-2024-06-12T16:08:26.8479671Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/netlinkwrapper/mocks	[no test files]
-2024-06-12T16:08:26.8481899Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/netwrapper	[no test files]
-2024-06-12T16:08:26.8515832Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/netwrapper/mocks	[no test files]
-2024-06-12T16:08:26.8517602Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/oswrapper	[no test files]
-2024-06-12T16:08:26.8519394Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/oswrapper/mocks	[no test files]
-2024-06-12T16:08:27.1871043Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/retry/mock	[no test files]
-2024-06-12T16:08:27.1872557Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/ttime	[no test files]
-2024-06-12T16:08:27.1874104Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/ttime/mocks	[no test files]
-2024-06-12T16:08:27.8751047Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/volume	[no test files]
-2024-06-12T16:08:27.8752449Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/volume/mocks	[no test files]
-2024-06-12T16:08:28.4051533Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/wsclient/mock	[no test files]
-2024-06-12T16:08:28.4053033Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/wsclient/mock/utils	[no test files]
-2024-06-12T16:08:28.4054427Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/wsclient/wsconn	[no test files]
-2024-06-12T16:08:28.4055330Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/wsclient/wsconn/mock	[no test files]
-2024-06-12T16:08:46.9281128Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tcs/handler	27.064s	coverage: 73.2% of statements
-2024-06-12T16:08:46.9283057Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds	1.016s	coverage: 84.0% of statements
-2024-06-12T16:08:46.9284785Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers	1.018s	coverage: [no statements]
-2024-06-12T16:08:46.9287127Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/taskprotection/v1/handlers	1.051s	coverage: 96.7% of statements
-2024-06-12T16:08:46.9289282Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/utils	1.017s	coverage: 86.2% of statements
-2024-06-12T16:08:46.9291141Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/v4	1.031s	coverage: 95.9% of statements
-2024-06-12T16:08:46.9293537Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/v4/state	1.017s	coverage: 46.2% of statements
-2024-06-12T16:08:46.9295480Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/logging	1.009s	coverage: 66.7% of statements
-2024-06-12T16:08:46.9297325Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/utils/mux	1.009s	coverage: 100.0% of statements
-2024-06-12T16:08:46.9299225Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/utils	1.023s	coverage: 71.4% of statements
-2024-06-12T16:08:46.9300951Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/utils/retry	1.012s	coverage: 100.0% of statements
-2024-06-12T16:08:46.9302626Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/utils/uuid	1.008s	coverage: 100.0% of statements
-2024-06-12T16:08:46.9304441Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/wsclient	12.713s	coverage: 61.8% of statements
-2024-06-12T16:08:47.0455519Z go tool cover -func cover.out > coverprofile-ecs-agent.out
-2024-06-12T16:08:47.2551869Z + make analyze-cover-profile
-2024-06-12T16:08:47.2608682Z pattern ./agent/...: directory prefix agent does not contain main module or its selected dependencies
-2024-06-12T16:08:47.2609910Z pattern ./ecs-agent/...: directory prefix ecs-agent does not contain main module or its selected dependencies
-2024-06-12T16:08:47.3083177Z ./scripts/analyze-cover-profile coverprofile.out
-2024-06-12T16:08:47.3252101Z Total unit test coverage: 74.8%
-2024-06-12T16:08:47.3273335Z ./scripts/analyze-cover-profile coverprofile-ecs-agent.out
-2024-06-12T16:08:47.3415016Z Total unit test coverage: 68.0%
+2024-06-08T00:01:57.3311388Z cd agent && GO111MODULE=on /opt/hostedtoolcache/go/1.20.1/x64/bin/go test -count=1 -race -tags unit -mod vendor -coverprofile ../cover.out -timeout=120s ./... && cd ..
+2024-06-08T00:02:43.5130098Z ?   	github.com/aws/amazon-ecs-agent/agent	[no test files]
+2024-06-08T00:02:51.6883914Z ok  	github.com/aws/amazon-ecs-agent/agent/acs/session	6.242s	coverage: 76.2% of statements
+2024-06-08T00:02:53.3014266Z ?   	github.com/aws/amazon-ecs-agent/agent/acs/updater/mock	[no test files]
+2024-06-08T00:02:53.4737676Z ok  	github.com/aws/amazon-ecs-agent/agent/acs/updater	0.156s	coverage: 86.9% of statements
+2024-06-08T00:02:53.4739434Z ok  	github.com/aws/amazon-ecs-agent/agent/api	0.065s	coverage: 37.0% of statements
+2024-06-08T00:02:53.4741421Z ok  	github.com/aws/amazon-ecs-agent/agent/api/appmesh	0.039s	coverage: 92.6% of statements
+2024-06-08T00:02:54.7866126Z ok  	github.com/aws/amazon-ecs-agent/agent/api/container	0.082s	coverage: 61.0% of statements
+2024-06-08T00:02:54.7868279Z ok  	github.com/aws/amazon-ecs-agent/agent/api/serviceconnect	0.040s	coverage: 86.9% of statements
+2024-06-08T00:02:57.6898046Z ok  	github.com/aws/amazon-ecs-agent/agent/api/task	0.182s	coverage: 80.4% of statements
+2024-06-08T00:02:57.6899312Z ok  	github.com/aws/amazon-ecs-agent/agent/api/testutils	0.069s	coverage: 83.1% of statements
+2024-06-08T00:02:59.0866715Z ?   	github.com/aws/amazon-ecs-agent/agent/app/args	[no test files]
+2024-06-08T00:02:59.0868712Z ?   	github.com/aws/amazon-ecs-agent/agent/app/factory	[no test files]
+2024-06-08T00:02:59.0870097Z ?   	github.com/aws/amazon-ecs-agent/agent/app/factory/mocks	[no test files]
+2024-06-08T00:02:59.0871485Z ?   	github.com/aws/amazon-ecs-agent/agent/app/mocks	[no test files]
+2024-06-08T00:02:59.6566409Z ?   	github.com/aws/amazon-ecs-agent/agent/asm/factory	[no test files]
+2024-06-08T00:02:59.6567951Z ?   	github.com/aws/amazon-ecs-agent/agent/asm/factory/mocks	[no test files]
+2024-06-08T00:02:59.6569475Z ?   	github.com/aws/amazon-ecs-agent/agent/asm/mocks	[no test files]
+2024-06-08T00:03:01.0171658Z ?   	github.com/aws/amazon-ecs-agent/agent/containermetadata/mocks	[no test files]
+2024-06-08T00:03:02.3879280Z ?   	github.com/aws/amazon-ecs-agent/agent/data/models	[no test files]
+2024-06-08T00:03:04.3781996Z ?   	github.com/aws/amazon-ecs-agent/agent/dockerclient/dockerapi/mocks	[no test files]
+2024-06-08T00:03:04.3784942Z ?   	github.com/aws/amazon-ecs-agent/agent/dockerclient/sdkclient	[no test files]
+2024-06-08T00:03:04.3786977Z ?   	github.com/aws/amazon-ecs-agent/agent/dockerclient/sdkclient/mocks	[no test files]
+2024-06-08T00:03:05.0752099Z ?   	github.com/aws/amazon-ecs-agent/agent/dockerclient/sdkclientfactory/mocks	[no test files]
+2024-06-08T00:03:09.8781679Z ?   	github.com/aws/amazon-ecs-agent/agent/ecr/mocks	[no test files]
+2024-06-08T00:03:09.9358814Z ?   	github.com/aws/amazon-ecs-agent/agent/ecr/model	[no test files]
+2024-06-08T00:03:09.9360588Z ?   	github.com/aws/amazon-ecs-agent/agent/ecr/model/ecr	[no test files]
+2024-06-08T00:03:11.6294394Z ?   	github.com/aws/amazon-ecs-agent/agent/ecscni/mocks	[no test files]
+2024-06-08T00:03:11.6815083Z ?   	github.com/aws/amazon-ecs-agent/agent/ecscni/mocks_cnitypes	[no test files]
+2024-06-08T00:03:11.6816902Z ?   	github.com/aws/amazon-ecs-agent/agent/ecscni/mocks_libcni	[no test files]
+2024-06-08T00:03:18.9701085Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/daemonmanager/mock	[no test files]
+2024-06-08T00:03:22.1160594Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/dockerstate/mocks	[no test files]
+2024-06-08T00:03:24.6312501Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/execcmd/mocks	[no test files]
+2024-06-08T00:03:24.6320281Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/image	[no test files]
+2024-06-08T00:03:26.8726972Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/mocks	[no test files]
+2024-06-08T00:03:26.8728484Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/serviceconnect/mock	[no test files]
+2024-06-08T00:03:27.1637205Z ?   	github.com/aws/amazon-ecs-agent/agent/engine/testutils	[no test files]
+2024-06-08T00:03:27.1644588Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/netlinkwrapper	[no test files]
+2024-06-08T00:03:27.2221029Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/netlinkwrapper/mocks	[no test files]
+2024-06-08T00:03:27.8858388Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/netwrapper	[no test files]
+2024-06-08T00:03:27.9486786Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/netwrapper/mocks	[no test files]
+2024-06-08T00:03:27.9488818Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/pause	[no test files]
+2024-06-08T00:03:27.9490251Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/udevwrapper	[no test files]
+2024-06-08T00:03:27.9491775Z ?   	github.com/aws/amazon-ecs-agent/agent/eni/udevwrapper/mocks	[no test files]
+2024-06-08T00:03:30.7496167Z ok  	github.com/aws/amazon-ecs-agent/agent/app	31.650s	coverage: 76.6% of statements
+2024-06-08T00:03:30.7498034Z ok  	github.com/aws/amazon-ecs-agent/agent/asm	0.045s	coverage: 90.5% of statements
+2024-06-08T00:03:30.7499712Z ok  	github.com/aws/amazon-ecs-agent/agent/config	0.213s	coverage: 91.4% of statements
+2024-06-08T00:03:30.7501766Z ok  	github.com/aws/amazon-ecs-agent/agent/containermetadata	0.053s	coverage: 93.8% of statements
+2024-06-08T00:03:30.7503661Z ok  	github.com/aws/amazon-ecs-agent/agent/data	0.355s	coverage: 70.7% of statements
+2024-06-08T00:03:30.7505940Z ok  	github.com/aws/amazon-ecs-agent/agent/data/transformationfunctions	0.044s	coverage: 17.4% of statements
+2024-06-08T00:03:30.7508453Z ok  	github.com/aws/amazon-ecs-agent/agent/dockerclient	0.022s	coverage: 91.9% of statements
+2024-06-08T00:03:30.7510365Z ok  	github.com/aws/amazon-ecs-agent/agent/dockerclient/dockerapi	4.389s	coverage: 77.8% of statements
+2024-06-08T00:03:30.7515026Z ok  	github.com/aws/amazon-ecs-agent/agent/dockerclient/dockerauth	0.049s	coverage: 95.8% of statements
+2024-06-08T00:03:30.7517457Z ok  	github.com/aws/amazon-ecs-agent/agent/dockerclient/sdkclientfactory	0.059s	coverage: 72.3% of statements
+2024-06-08T00:03:30.7519497Z ok  	github.com/aws/amazon-ecs-agent/agent/doctor	0.110s	coverage: 68.8% of statements
+2024-06-08T00:03:30.7521759Z ok  	github.com/aws/amazon-ecs-agent/agent/doctor/statustracker	0.033s	coverage: 96.3% of statements
+2024-06-08T00:03:30.7524295Z ok  	github.com/aws/amazon-ecs-agent/agent/ebs	2.162s	coverage: 84.8% of statements
+2024-06-08T00:03:30.7525840Z ok  	github.com/aws/amazon-ecs-agent/agent/ecr	0.087s	coverage: 52.0% of statements
+2024-06-08T00:03:30.7527328Z ok  	github.com/aws/amazon-ecs-agent/agent/ecscni	0.222s	coverage: 73.8% of statements
+2024-06-08T00:03:31.2022473Z ?   	github.com/aws/amazon-ecs-agent/agent/fsx/factory	[no test files]
+2024-06-08T00:03:31.2290511Z ?   	github.com/aws/amazon-ecs-agent/agent/fsx/factory/mocks	[no test files]
+2024-06-08T00:03:31.2292412Z ?   	github.com/aws/amazon-ecs-agent/agent/fsx/mocks	[no test files]
+2024-06-08T00:03:31.6738430Z ?   	github.com/aws/amazon-ecs-agent/agent/gpu/mocks	[no test files]
+2024-06-08T00:03:34.1216381Z ?   	github.com/aws/amazon-ecs-agent/agent/handlers/mocks	[no test files]
+2024-06-08T00:03:34.1700552Z ?   	github.com/aws/amazon-ecs-agent/agent/handlers/mocks/http	[no test files]
+2024-06-08T00:03:34.1702249Z ?   	github.com/aws/amazon-ecs-agent/agent/handlers/utils	[no test files]
+2024-06-08T00:03:37.8137048Z ?   	github.com/aws/amazon-ecs-agent/agent/logger/audit/mocks	[no test files]
+2024-06-08T00:03:38.7009751Z ?   	github.com/aws/amazon-ecs-agent/agent/s3/factory	[no test files]
+2024-06-08T00:03:38.7011703Z ?   	github.com/aws/amazon-ecs-agent/agent/s3/factory/mocks	[no test files]
+2024-06-08T00:03:38.7013544Z ?   	github.com/aws/amazon-ecs-agent/agent/s3/mocks	[no test files]
+2024-06-08T00:03:38.7015282Z ?   	github.com/aws/amazon-ecs-agent/agent/s3/mocks/s3manager	[no test files]
+2024-06-08T00:03:40.2202457Z ?   	github.com/aws/amazon-ecs-agent/agent/sighandlers/exitcodes	[no test files]
+2024-06-08T00:03:40.6092371Z ?   	github.com/aws/amazon-ecs-agent/agent/ssm/factory	[no test files]
+2024-06-08T00:03:40.6094546Z ?   	github.com/aws/amazon-ecs-agent/agent/ssm/factory/mocks	[no test files]
+2024-06-08T00:03:40.6096522Z ?   	github.com/aws/amazon-ecs-agent/agent/ssm/mocks	[no test files]
+2024-06-08T00:03:40.6098153Z ?   	github.com/aws/amazon-ecs-agent/agent/statechange	[no test files]
+2024-06-08T00:03:42.2195962Z ?   	github.com/aws/amazon-ecs-agent/agent/statemanager/dependencies	[no test files]
+2024-06-08T00:03:42.2198807Z ?   	github.com/aws/amazon-ecs-agent/agent/statemanager/mocks	[no test files]
+2024-06-08T00:03:44.7983832Z ?   	github.com/aws/amazon-ecs-agent/agent/stats/mock	[no test files]
+2024-06-08T00:03:44.7985861Z ?   	github.com/aws/amazon-ecs-agent/agent/stats/resolver	[no test files]
+2024-06-08T00:03:44.7987268Z ?   	github.com/aws/amazon-ecs-agent/agent/stats/resolver/mock	[no test files]
+2024-06-08T00:03:44.7988906Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource	[no test files]
+2024-06-08T00:03:47.4277602Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup/control/factory	[no test files]
+2024-06-08T00:03:47.4279492Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup/control/factory/mock	[no test files]
+2024-06-08T00:03:47.4281695Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup/control/factory/mock_factory	[no test files]
+2024-06-08T00:03:47.4283627Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup/control/mock_control	[no test files]
+2024-06-08T00:03:51.4541069Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/mocks	[no test files]
+2024-06-08T00:03:52.7063590Z ?   	github.com/aws/amazon-ecs-agent/agent/taskresource/status	[no test files]
+2024-06-08T00:03:54.7551994Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/bufiowrapper	[no test files]
+2024-06-08T00:03:54.7554457Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/bufiowrapper/mocks	[no test files]
+2024-06-08T00:03:54.7556713Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/ioutilwrapper	[no test files]
+2024-06-08T00:03:54.7558747Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/ioutilwrapper/mocks	[no test files]
+2024-06-08T00:03:55.6597018Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/loader/mocks	[no test files]
+2024-06-08T00:03:55.6598473Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/mobypkgwrapper	[no test files]
+2024-06-08T00:03:55.6599662Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/mobypkgwrapper/mocks	[no test files]
+2024-06-08T00:03:55.6600779Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/mocks	[no test files]
+2024-06-08T00:03:55.6602067Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/nswrapper	[no test files]
+2024-06-08T00:03:55.6603119Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/nswrapper/mocks	[no test files]
+2024-06-08T00:03:55.6604188Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/oswrapper	[no test files]
+2024-06-08T00:03:55.6605335Z ?   	github.com/aws/amazon-ecs-agent/agent/utils/oswrapper/mocks	[no test files]
+2024-06-08T00:03:55.9136485Z ?   	github.com/aws/amazon-ecs-agent/agent/version	[no test files]
+2024-06-08T00:03:55.9456792Z ?   	github.com/aws/amazon-ecs-agent/agent/version/gen	[no test files]
+2024-06-08T00:05:08.2236114Z ok  	github.com/aws/amazon-ecs-agent/agent/engine	109.242s	coverage: 82.9% of statements
+2024-06-08T00:05:08.2238067Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/daemonmanager	0.115s	coverage: 56.9% of statements
+2024-06-08T00:05:08.2239964Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/dependencygraph	0.127s	coverage: 88.5% of statements
+2024-06-08T00:05:08.2242053Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/dockerstate	0.107s	coverage: 85.6% of statements
+2024-06-08T00:05:08.2244117Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/dockerstate/testutils	0.090s	coverage: 72.7% of statements
+2024-06-08T00:05:08.2246023Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/execcmd	0.155s	coverage: 92.9% of statements
+2024-06-08T00:05:08.2248061Z ok  	github.com/aws/amazon-ecs-agent/agent/engine/serviceconnect	0.091s	coverage: 57.9% of statements
+2024-06-08T00:05:08.2249984Z ok  	github.com/aws/amazon-ecs-agent/agent/eni/networkutils	0.050s	coverage: 100.0% of statements
+2024-06-08T00:05:08.2251765Z ok  	github.com/aws/amazon-ecs-agent/agent/eni/watcher	0.307s	coverage: 72.6% of statements
+2024-06-08T00:05:08.2253540Z ok  	github.com/aws/amazon-ecs-agent/agent/eventhandler	1.464s	coverage: 83.7% of statements
+2024-06-08T00:05:08.2255204Z ok  	github.com/aws/amazon-ecs-agent/agent/fsx	0.027s	coverage: 100.0% of statements
+2024-06-08T00:05:08.2257100Z ok  	github.com/aws/amazon-ecs-agent/agent/gpu	0.033s	coverage: 74.5% of statements
+2024-06-08T00:05:08.2258831Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers	0.741s	coverage: 66.7% of statements
+2024-06-08T00:05:08.2260746Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers/agentapi/taskprotection	0.033s	coverage: 100.0% of statements
+2024-06-08T00:05:08.2262707Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers/v1	0.055s	coverage: 42.7% of statements
+2024-06-08T00:05:08.2264518Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers/v2	0.059s	coverage: 52.1% of statements
+2024-06-08T00:05:08.2266478Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers/v3	0.071s	coverage: 5.6% of statements
+2024-06-08T00:05:08.2268233Z ok  	github.com/aws/amazon-ecs-agent/agent/handlers/v4	0.066s	coverage: 17.9% of statements
+2024-06-08T00:05:08.2270126Z ok  	github.com/aws/amazon-ecs-agent/agent/logger/audit	0.035s	coverage: 73.5% of statements
+2024-06-08T00:05:08.2272126Z ok  	github.com/aws/amazon-ecs-agent/agent/metrics	3.050s	coverage: 73.6% of statements
+2024-06-08T00:05:08.2273762Z ok  	github.com/aws/amazon-ecs-agent/agent/s3	0.034s	coverage: 95.0% of statements
+2024-06-08T00:05:08.2275544Z ok  	github.com/aws/amazon-ecs-agent/agent/sighandlers	0.123s	coverage: 53.7% of statements
+2024-06-08T00:05:08.2277177Z ok  	github.com/aws/amazon-ecs-agent/agent/ssm	0.032s	coverage: 90.5% of statements
+2024-06-08T00:05:08.2278796Z ok  	github.com/aws/amazon-ecs-agent/agent/statemanager	0.157s	coverage: 65.5% of statements
+2024-06-08T00:05:08.2280620Z ok  	github.com/aws/amazon-ecs-agent/agent/stats	20.311s	coverage: 81.6% of statements
+2024-06-08T00:05:08.2282309Z ok  	github.com/aws/amazon-ecs-agent/agent/stats/reporter	0.087s	coverage: 94.7% of statements
+2024-06-08T00:05:08.2284044Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/asmauth	0.090s	coverage: 65.8% of statements
+2024-06-08T00:05:08.2286123Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/asmsecret	0.055s	coverage: 73.6% of statements
+2024-06-08T00:05:08.2288085Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup	0.055s	coverage: 62.3% of statements
+2024-06-08T00:05:08.2290087Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/cgroup/control	0.033s	coverage: 37.9% of statements
+2024-06-08T00:05:08.2292253Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/credentialspec	0.056s	coverage: 56.6% of statements
+2024-06-08T00:05:08.2294254Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/envFiles	4.119s	coverage: 57.4% of statements
+2024-06-08T00:05:08.2296182Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/firelens	0.063s	coverage: 76.8% of statements
+2024-06-08T00:05:08.2298320Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/fsxwindowsfileserver	0.043s	coverage: 42.2% of statements
+2024-06-08T00:05:08.2300334Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/ssmsecret	0.053s	coverage: 74.2% of statements
+2024-06-08T00:05:08.2302266Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/types	0.053s	coverage: 49.2% of statements
+2024-06-08T00:05:08.2304224Z ok  	github.com/aws/amazon-ecs-agent/agent/taskresource/volume	0.053s	coverage: 72.2% of statements
+2024-06-08T00:05:08.2306139Z ok  	github.com/aws/amazon-ecs-agent/agent/utils	1.074s	coverage: 75.1% of statements
+2024-06-08T00:05:08.2307710Z ok  	github.com/aws/amazon-ecs-agent/agent/utils/loader	0.043s	coverage: 96.0% of statements
+2024-06-08T00:05:08.2309539Z ok  	github.com/aws/amazon-ecs-agent/agent/utils/reference	0.032s	coverage: 100.0% of statements
+2024-06-08T00:05:08.4263115Z go tool cover -func cover.out > coverprofile.out
+2024-06-08T00:05:08.8361424Z cd ecs-agent && GO111MODULE=on /opt/hostedtoolcache/go/1.20.1/x64/bin/go test -count=1 -race -tags unit -mod vendor -coverprofile ../cover.out -timeout=120s ./... && cd ..
+2024-06-08T00:05:14.8023517Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/acs/model	[no test files]
+2024-06-08T00:05:14.8024933Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/acs/model/ecsacs	[no test files]
+2024-06-08T00:05:14.8779961Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/acs/client	0.066s	coverage: 95.0% of statements
+2024-06-08T00:05:17.9751083Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/acs/session/mocks	[no test files]
+2024-06-08T00:05:17.9759515Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/acs/session/testconst	[no test files]
+2024-06-08T00:05:19.5698740Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/acs/session	1.585s	coverage: 90.2% of statements
+2024-06-08T00:05:20.3816682Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/appnet/mocks	[no test files]
+2024-06-08T00:05:20.8491101Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/attachment/resource/mocks	[no test files]
+2024-06-08T00:05:24.4461268Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/appnet	4.057s	coverage: 93.5% of statements
+2024-06-08T00:05:24.4463438Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/attachment	0.029s	coverage: 80.0% of statements
+2024-06-08T00:05:24.4467412Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/attachment/eni	0.641s	coverage: 73.5% of statements
+2024-06-08T00:05:24.4470119Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/attachment/resource	0.171s	coverage: 45.7% of statements
+2024-06-08T00:05:24.4472356Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/container/restart	0.032s	coverage: 89.3% of statements
+2024-06-08T00:05:24.4474338Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/container/status	0.032s	coverage: 69.8% of statements
+2024-06-08T00:05:24.4478988Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs	0.033s	coverage: 92.0% of statements
+2024-06-08T00:05:36.4573995Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/mocks	[no test files]
+2024-06-08T00:05:36.4575540Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/mocks/client	[no test files]
+2024-06-08T00:05:36.4577294Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/mocks/statechange	[no test files]
+2024-06-08T00:05:36.4661454Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/model	[no test files]
+2024-06-08T00:05:36.4663093Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/model/ecs	[no test files]
+2024-06-08T00:05:36.4666180Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/api/errors	[no test files]
+2024-06-08T00:05:36.8542466Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/async/mocks	[no test files]
+2024-06-08T00:05:36.8543933Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/config	[no test files]
+2024-06-08T00:05:36.8546027Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/config/mocks	[no test files]
+2024-06-08T00:05:36.9962490Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/client	0.530s	coverage: 88.0% of statements
+2024-06-08T00:05:36.9965094Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/api/task/status	0.021s	coverage: 46.8% of statements
+2024-06-08T00:05:37.2787100Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/async	0.423s	coverage: 96.6% of statements
+2024-06-08T00:05:37.2810266Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/credentials	0.031s	coverage: 100.0% of statements
+2024-06-08T00:05:37.3471630Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/credentials/mocks	[no test files]
+2024-06-08T00:05:37.3954322Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/credentials/instancecreds	0.040s	coverage: 100.0% of statements
+2024-06-08T00:05:38.8536207Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/credentials/providers	1.027s	coverage: 100.0% of statements
+2024-06-08T00:05:53.9762232Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/csiclient	0.043s	coverage: 1.4% of statements
+2024-06-08T00:05:54.0748555Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/csiclient/mocks	[no test files]
+2024-06-08T00:05:54.1054014Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/ec2/http	[no test files]
+2024-06-08T00:05:54.1154047Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/data	0.038s	coverage: 48.5% of statements
+2024-06-08T00:05:54.1155718Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/doctor	0.023s	coverage: 82.5% of statements
+2024-06-08T00:05:54.1272429Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/ec2	0.044s	coverage: 52.2% of statements
+2024-06-08T00:05:54.1394084Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/ec2/http/mocks	[no test files]
+2024-06-08T00:05:54.1403522Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/ec2/mocks	[no test files]
+2024-06-08T00:05:54.9844090Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/gmsacredclient/credentialsfetcher	[no test files]
+2024-06-08T00:05:54.9847083Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/httpclient/mock	[no test files]
+2024-06-08T00:05:55.5188446Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/logger/audit	[no test files]
+2024-06-08T00:05:55.5190025Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/logger/audit/mocks	[no test files]
+2024-06-08T00:05:55.5191587Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/logger/audit/request	[no test files]
+2024-06-08T00:05:55.5194071Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/logger/field	[no test files]
+2024-06-08T00:05:55.5195249Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/logger/mocks	[no test files]
+2024-06-08T00:05:55.6404188Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/eventstream	1.031s	coverage: 95.0% of statements
+2024-06-08T00:05:55.6407062Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/gmsacredclient	0.056s	coverage: 76.8% of statements
+2024-06-08T00:05:55.6409531Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/httpclient	0.027s	coverage: 75.0% of statements
+2024-06-08T00:05:55.6411765Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/logger	0.045s	coverage: 81.7% of statements
+2024-06-08T00:05:56.0025022Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/metrics	[no test files]
+2024-06-08T00:05:56.0026383Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/metrics/mocks	[no test files]
+2024-06-08T00:05:56.0487226Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/manageddaemon	0.039s	coverage: 67.4% of statements
+2024-06-08T00:05:56.0672210Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/modeltransformer	0.027s	coverage: 92.3% of statements
+2024-06-08T00:05:59.3642321Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/data	[no test files]
+2024-06-08T00:05:59.3644738Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/data/mocks	[no test files]
+2024-06-08T00:05:59.3648865Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/mocks	[no test files]
+2024-06-08T00:05:59.4221968Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib	0.052s	coverage: 68.5% of statements
+2024-06-08T00:05:59.8194325Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/appmesh	0.031s	coverage: 92.6% of statements
+2024-06-08T00:06:00.0117616Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/ecscni/mocks_ecscni	[no test files]
+2024-06-08T00:06:00.0121657Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/ecscni/mocks_libcni	[no test files]
+2024-06-08T00:06:00.0124792Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/ecscni/mocks_nsutil	[no test files]
+2024-06-08T00:06:00.0551327Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/ecscni	0.035s	coverage: 13.5% of statements
+2024-06-08T00:06:00.0817586Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/mocks_libcni	[no test files]
+2024-06-08T00:06:00.6107363Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/serviceconnect	[no test files]
+2024-06-08T00:06:01.0296710Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/networkinterface	0.412s	coverage: 11.2% of statements
+2024-06-08T00:06:01.0298802Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/status	0.037s	coverage: 66.7% of statements
+2024-06-08T00:06:01.0300408Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/model/tasknetworkconfig	0.031s	coverage: 67.5% of statements
+2024-06-08T00:06:01.4890607Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/platform/mocks	[no test files]
+2024-06-08T00:06:01.4892338Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/stats	[no test files]
+2024-06-08T00:06:01.5409079Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/netlib/platform	0.044s	coverage: 46.1% of statements
+2024-06-08T00:06:02.2016045Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tcs/model	[no test files]
+2024-06-08T00:06:02.2018080Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tcs/model/ecstcs	[no test files]
+2024-06-08T00:06:03.0498008Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/response	[no test files]
+2024-06-08T00:06:04.1037211Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/taskprotection/v1/types	[no test files]
+2024-06-08T00:06:04.5267101Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/v1	[no test files]
+2024-06-08T00:06:04.5268969Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/v2	[no test files]
+2024-06-08T00:06:05.2024776Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/v4/state/mocks	[no test files]
+2024-06-08T00:06:05.9868977Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/arn	[no test files]
+2024-06-08T00:06:05.9870427Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/cipher	[no test files]
+2024-06-08T00:06:05.9872303Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/httpproxy	[no test files]
+2024-06-08T00:06:05.9874005Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/ioutilwrapper	[no test files]
+2024-06-08T00:06:05.9875589Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/ioutilwrapper/mocks	[no test files]
+2024-06-08T00:06:05.9879217Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/netlinkwrapper	[no test files]
+2024-06-08T00:06:05.9880863Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/netlinkwrapper/mocks	[no test files]
+2024-06-08T00:06:05.9882804Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/netwrapper	[no test files]
+2024-06-08T00:06:05.9884484Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/netwrapper/mocks	[no test files]
+2024-06-08T00:06:05.9886672Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/oswrapper	[no test files]
+2024-06-08T00:06:05.9888157Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/oswrapper/mocks	[no test files]
+2024-06-08T00:06:06.3351657Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/retry/mock	[no test files]
+2024-06-08T00:06:06.3353196Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/ttime	[no test files]
+2024-06-08T00:06:06.3354682Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/utils/ttime/mocks	[no test files]
+2024-06-08T00:06:06.5928256Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/volume	[no test files]
+2024-06-08T00:06:06.5929980Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/volume/mocks	[no test files]
+2024-06-08T00:06:07.2113059Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/wsclient/mock	[no test files]
+2024-06-08T00:06:07.2114348Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/wsclient/mock/utils	[no test files]
+2024-06-08T00:06:07.2115549Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/wsclient/wsconn	[no test files]
+2024-06-08T00:06:07.2116385Z ?   	github.com/aws/amazon-ecs-agent/ecs-agent/wsclient/wsconn/mock	[no test files]
+2024-06-08T00:06:08.2998055Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tcs/client	6.092s	coverage: 76.3% of statements
+2024-06-08T00:06:29.8062822Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tcs/handler	27.598s	coverage: 73.2% of statements
+2024-06-08T00:06:29.8065180Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds	0.035s	coverage: 84.0% of statements
+2024-06-08T00:06:29.8067036Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers	0.032s	coverage: [no statements]
+2024-06-08T00:06:29.8069293Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/taskprotection/v1/handlers	0.065s	coverage: 96.7% of statements
+2024-06-08T00:06:29.8071830Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/utils	0.033s	coverage: 86.2% of statements
+2024-06-08T00:06:29.8073929Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/v4	0.045s	coverage: 95.9% of statements
+2024-06-08T00:06:29.8076127Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/handlers/v4/state	0.032s	coverage: 46.2% of statements
+2024-06-08T00:06:29.8078086Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/logging	0.021s	coverage: 66.7% of statements
+2024-06-08T00:06:29.8080341Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/tmds/utils/mux	0.022s	coverage: 100.0% of statements
+2024-06-08T00:06:29.8082232Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/utils	0.034s	coverage: 74.2% of statements
+2024-06-08T00:06:29.8083963Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/utils/retry	0.022s	coverage: 100.0% of statements
+2024-06-08T00:06:29.8085726Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/utils/uuid	0.022s	coverage: 100.0% of statements
+2024-06-08T00:06:29.8087597Z ok  	github.com/aws/amazon-ecs-agent/ecs-agent/wsclient	12.181s	coverage: 61.8% of statements
+2024-06-08T00:06:29.9293586Z go tool cover -func cover.out > coverprofile-ecs-agent.out
+2024-06-08T00:06:30.1775478Z + make analyze-cover-profile
+2024-06-08T00:06:30.1842933Z pattern ./agent/...: directory prefix agent does not contain main module or its selected dependencies
+2024-06-08T00:06:30.1844776Z pattern ./ecs-agent/...: directory prefix ecs-agent does not contain main module or its selected dependencies
+2024-06-08T00:06:30.2323976Z ./scripts/analyze-cover-profile coverprofile.out
+2024-06-08T00:06:30.2505355Z Total unit test coverage: 74.4%
+2024-06-08T00:06:30.2526420Z ./scripts/analyze-cover-profile coverprofile-ecs-agent.out
+2024-06-08T00:06:30.2669514Z Total unit test coverage: 68.1%
