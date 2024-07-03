@@ -42,7 +42,7 @@ func NewManager() Manager {
 func (m *manager) AugmentTaskContainer(*apitask.Task, *apicontainer.Container, *dockercontainer.HostConfig) error {
 	return fmt.Errorf("ServiceConnect is only supported on linux")
 }
-func (m *manager) CreateInstanceTask(config *config.Config) (*apitask.Task, error) {
+func (m *manager) CreateInstanceTask(config *config.Config, dockerClient dockerapi.DockerClient) (*apitask.Task, error) {
 	return nil, fmt.Errorf("ServiceConnect is only supported on linux")
 }
 func (m *manager) AugmentInstanceContainer(*apitask.Task, *apicontainer.Container, *dockercontainer.HostConfig) error {

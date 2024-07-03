@@ -27,6 +27,7 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/aws/amazon-ecs-agent/ecs-agent/api/ecs/model/ecs"
 	commonutils "github.com/aws/amazon-ecs-agent/ecs-agent/utils"
@@ -243,4 +244,26 @@ func FileExists(filePath string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+// Retry retries a provided function fun maxAttempts times with a sleep of retryInterval
+// between attempts until it succeeds.
+//
+// This function returns a bool to indicate if an attempt succeeded. True is returned to indicate
+// a successful attempt, and false is returned to indicate that no attempt was successful.
+// Retrying stops on a successful attempt.
+func Retry(fun func() (bool, error), maxAttempts int, retryInterval time.Duration) (bool, error) {
+	var err error
+	var success bool
+
+	for i := 0; i < maxAttempts; i++ {
+		success, err = fun()
+		if success {
+			break
+		}
+
+		time.Sleep(retryInterval)
+	}
+
+	return success, err
 }

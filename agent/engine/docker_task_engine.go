@@ -1160,7 +1160,7 @@ func (engine *DockerTaskEngine) AddTask(task *apitask.Task) {
 	// Check if ServiceConnect is Needed
 	if task.IsServiceConnectEnabled() {
 		if engine.serviceconnectRelay == nil {
-			engine.serviceconnectRelay, err = engine.serviceconnectManager.CreateInstanceTask(engine.cfg)
+			engine.serviceconnectRelay, err = engine.serviceconnectManager.CreateInstanceTask(engine.cfg, engine.client)
 
 			if err != nil {
 				logger.Error("Unable to start relay for task in the engine", logger.Fields{

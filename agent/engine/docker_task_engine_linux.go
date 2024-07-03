@@ -107,7 +107,7 @@ func (engine *DockerTaskEngine) reloadAppNetImage() error {
 
 func (engine *DockerTaskEngine) restartInstanceTask() {
 	if engine.serviceconnectRelay != nil {
-		serviceconnectRelayTask, err := engine.serviceconnectManager.CreateInstanceTask(engine.cfg)
+		serviceconnectRelayTask, err := engine.serviceconnectManager.CreateInstanceTask(engine.cfg, engine.client)
 		if err != nil {
 			logger.Error(fmt.Sprintf("Unable to start relay for task in the engine: %v", err))
 			return
