@@ -18,7 +18,6 @@ package engine
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"sync"
@@ -40,8 +39,8 @@ import (
 	apicontainerstatus "github.com/aws/amazon-ecs-agent/ecs-agent/api/container/status"
 	apitaskstatus "github.com/aws/amazon-ecs-agent/ecs-agent/api/task/status"
 	mock_ttime "github.com/aws/amazon-ecs-agent/ecs-agent/utils/ttime/mocks"
-
 	"github.com/golang/mock/gomock"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -49,28 +48,31 @@ import (
 // generic resources (e.g. volume) tests should be added to common test file.
 func TestHandleResourceStateChangeAndSave(t *testing.T) {
 	testCases := []struct {
-		Name               string
-		KnownStatus        resourcestatus.ResourceStatus
-		DesiredKnownStatus resourcestatus.ResourceStatus
-		Err                error
-		ChangedKnownStatus resourcestatus.ResourceStatus
-		TaskDesiredStatus  apitaskstatus.TaskStatus
+		Name                   string
+		KnownStatus            resourcestatus.ResourceStatus
+		DesiredKnownStatus     resourcestatus.ResourceStatus
+		Err                    error
+		ChangedKnownStatus     resourcestatus.ResourceStatus
+		TaskDesiredStatus      apitaskstatus.TaskStatus
+		ContainerDesiredStatus apicontainerstatus.ContainerStatus
 	}{
 		{
-			Name:               "error while steady state transition",
-			KnownStatus:        resourcestatus.ResourceStatus(cgroup.CgroupStatusNone),
-			DesiredKnownStatus: resourcestatus.ResourceStatus(cgroup.CgroupCreated),
-			Err:                errors.New("transition error"),
-			ChangedKnownStatus: resourcestatus.ResourceStatus(cgroup.CgroupStatusNone),
-			TaskDesiredStatus:  apitaskstatus.TaskStopped,
+			Name:                   "steady state transition",
+			KnownStatus:            resourcestatus.ResourceStatus(cgroup.CgroupStatusNone),
+			DesiredKnownStatus:     resourcestatus.ResourceStatus(cgroup.CgroupCreated),
+			ChangedKnownStatus:     resourcestatus.ResourceStatus(cgroup.CgroupCreated),
+			TaskDesiredStatus:      apitaskstatus.TaskRunning,
+			ContainerDesiredStatus: apicontainerstatus.ContainerRunning,
+			Err:                    nil,
 		},
 		{
-			Name:               "steady state transition",
-			KnownStatus:        resourcestatus.ResourceStatus(cgroup.CgroupStatusNone),
-			DesiredKnownStatus: resourcestatus.ResourceStatus(cgroup.CgroupCreated),
-			Err:                nil,
-			ChangedKnownStatus: resourcestatus.ResourceStatus(cgroup.CgroupCreated),
-			TaskDesiredStatus:  apitaskstatus.TaskRunning,
+			Name:                   "error while steady state transition",
+			KnownStatus:            resourcestatus.ResourceStatus(cgroup.CgroupStatusNone),
+			DesiredKnownStatus:     resourcestatus.ResourceStatus(cgroup.CgroupCreated),
+			ChangedKnownStatus:     resourcestatus.ResourceStatus(cgroup.CgroupStatusNone),
+			TaskDesiredStatus:      apitaskstatus.TaskStopped,
+			ContainerDesiredStatus: apicontainerstatus.ContainerStopped,
+			Err:                    errors.New("transition error"),
 		},
 	}
 	for _, tc := range testCases {
@@ -79,11 +81,14 @@ func TestHandleResourceStateChangeAndSave(t *testing.T) {
 			defer ctrl.Finish()
 			res := &cgroup.CgroupResource{}
 			res.SetKnownStatus(tc.KnownStatus)
+
 			mtask := managedTask{
 				Task: &apitask.Task{
 					Arn:                 "task1",
 					ResourcesMapUnsafe:  make(map[string][]taskresource.TaskResource),
 					DesiredStatusUnsafe: apitaskstatus.TaskRunning,
+					Containers: []*apicontainer.Container{createTestContainerWithImageAndName(testRegistryImage,
+						"test")},
 				},
 				engine: &DockerTaskEngine{
 					dataClient: data.NewNoopClient(),
@@ -95,6 +100,7 @@ func TestHandleResourceStateChangeAndSave(t *testing.T) {
 			})
 			assert.Equal(t, tc.ChangedKnownStatus, res.GetKnownStatus())
 			assert.Equal(t, tc.TaskDesiredStatus, mtask.GetDesiredStatus())
+			assert.Equal(t, tc.ContainerDesiredStatus, mtask.Containers[0].GetDesiredStatus())
 		})
 	}
 }
