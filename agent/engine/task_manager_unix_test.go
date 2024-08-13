@@ -87,8 +87,11 @@ func TestHandleResourceStateChangeAndSave(t *testing.T) {
 					Arn:                 "task1",
 					ResourcesMapUnsafe:  make(map[string][]taskresource.TaskResource),
 					DesiredStatusUnsafe: apitaskstatus.TaskRunning,
-					Containers: []*apicontainer.Container{createTestContainerWithImageAndName(testRegistryImage,
-						"test")},
+					Containers: []*apicontainer.Container{
+						{
+							Name: "ctr1",
+						},
+					},
 				},
 				engine: &DockerTaskEngine{
 					dataClient: data.NewNoopClient(),
