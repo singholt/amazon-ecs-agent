@@ -2092,7 +2092,7 @@ func getFirelensLogConfig(task *apitask.Task, container *apicontainer.Container,
 	logConfig.Config = make(map[string]string)
 	logConfig.Config[logDriverTag] = tag
 	logConfig.Config[logDriverFluentdAddress] = fluentd
-	logConfig.Config[logDriverAsyncConnect] = strconv.FormatBool(true)
+	logConfig.Config[logDriverAsyncConnect] = strconv.FormatBool(false)
 	logConfig.Config[logDriverSubSecondPrecision] = strconv.FormatBool(true)
 	if bufferLimitExists {
 		logConfig.Config[logDriverBufferLimit] = bufferLimit
