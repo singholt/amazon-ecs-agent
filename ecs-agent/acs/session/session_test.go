@@ -837,7 +837,7 @@ func TestSessionReconnectsOnDiscoverPollEndpointError(t *testing.T) {
 		metricsFactory:       mockMetricsFactory,
 		heartbeatTimeout:     20 * time.Millisecond,
 		heartbeatJitter:      10 * time.Millisecond,
-		disconnectTimeout:    30 * time.Millisecond,
+		disconnectTimeout:    30 * time.Second,
 		disconnectJitter:     10 * time.Millisecond,
 		backoff: retry.NewExponentialBackoff(connectionBackoffMin, connectionBackoffMax,
 			connectionBackoffJitter, connectionBackoffMultiplier),
