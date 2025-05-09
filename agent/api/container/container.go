@@ -1299,6 +1299,12 @@ func (c *Container) GetUser() string {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
 
+	// Hack for demo
+	if c.Name == "log-router" {
+		seelog.Debug("DEMO: Firelens user is 1234:5678")
+		return "1234:5678"
+	}
+
 	// Get the container user from the container's Docker Config
 	if c.DockerConfig.Config == nil {
 		return ""

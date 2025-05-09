@@ -2075,6 +2075,15 @@ func (engine *DockerTaskEngine) createContainer(task *apitask.Task, container *a
 	config.Labels[labelTaskDefinitionVersion] = task.Version
 	config.Labels[labelCluster] = engine.cfg.Cluster
 
+	// Hack for demo
+	if container.Name == "log-router" {
+		logger.Debug("Demo: Setting Firelens container user to 1234:5678", logger.Fields{
+			field.TaskID:    task.GetID(),
+			field.Container: container.Name,
+		})
+		config.User = "1234:5678"
+	}
+
 	if dockerContainerName == "" {
 		// only alphanumeric and hyphen characters are allowed
 		reInvalidChars := regexp.MustCompile("[^A-Za-z0-9-]+")
