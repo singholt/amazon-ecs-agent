@@ -53,6 +53,7 @@ func (r *heartbeatResponder) HandlerFunc() wsclient.RequestHandler {
 func (r *heartbeatResponder) processHeartbeatMessage(message *ecsacs.HeartbeatMessage) {
 	// Agent will run container instance healthchecks. They are triggered by ACS heartbeat.
 	// Results of healthchecks will be sent on to TACS.
+	logger.Info("Recieved a heartbeat message from ACS, running instance healthcheck")
 	go r.doctor.RunHealthchecks()
 
 	// Agent will send simple ack

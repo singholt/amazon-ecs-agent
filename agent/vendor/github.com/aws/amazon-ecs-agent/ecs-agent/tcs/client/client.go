@@ -471,13 +471,41 @@ func (cs *tcsClientServer) getInstanceStatuses() []*ecstcs.InstanceStatus {
 	var instanceStatuses []*ecstcs.InstanceStatus
 
 	for _, healthcheck := range *cs.doctor.GetHealthchecks() {
+		seelog.Infof("TCS reading healthcheck instance: %p, Type: %s", healthcheck, healthcheck.GetHealthcheckType())
+
+		lastHealthcheckTime := healthcheck.GetLastHealthcheckTime()
+		seelog.Infof("TCS healthcheck LastHealthcheckTime: %v", lastHealthcheckTime)
+
+		awsTimeResult := aws.Time(lastHealthcheckTime)
+		seelog.Infof("aws.Time() result: %v (nil: %t)", awsTimeResult, awsTimeResult == nil)
+
+		utilsTimestamp := (*utils.Timestamp)(awsTimeResult)
+		seelog.Infof("utils.Timestamp result: %v (nil: %t)", utilsTimestamp, utilsTimestamp == nil)
+
+		// Test JSON marshaling
+		if utilsTimestamp != nil {
+			jsonBytes, err := utilsTimestamp.MarshalJSON()
+			seelog.Infof("JSON marshaling result: %s (err: %v)", string(jsonBytes), err)
+		}
+
 		instanceStatus := &ecstcs.InstanceStatus{
 			LastStatusChange: (*utils.Timestamp)(aws.Time(healthcheck.GetStatusChangeTime())),
-			LastUpdated:      (*utils.Timestamp)(aws.Time(healthcheck.GetLastHealthcheckTime())),
+			LastUpdated:      utilsTimestamp,
 			Status:           aws.String(healthcheck.GetHealthcheckStatus().String()),
 			Type:             aws.String(healthcheck.GetHealthcheckType()),
 		}
+		seelog.Infof("InstanceStatus LastUpdated field: %v (nil: %t)", instanceStatus.LastUpdated, instanceStatus.LastUpdated == nil)
 		instanceStatuses = append(instanceStatuses, instanceStatus)
+	}
+
+	// Show the actual JSON that will be sent to TACS
+	if len(instanceStatuses) > 0 {
+		jsonBytes, err := json.Marshal(instanceStatuses[0])
+		if err != nil {
+			seelog.Infof("Reporting instance status to TACS (JSON marshal error): %v", err)
+		} else {
+			seelog.Infof("Reporting instance status to TACS (actual JSON): %s", string(jsonBytes))
+		}
 	}
 	return instanceStatuses
 }

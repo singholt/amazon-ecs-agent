@@ -78,6 +78,8 @@ func (dhc *dockerRuntimeHealthcheck) SetHealthcheckStatus(healthStatus doctor.He
 	// track previous status
 	dhc.LastStatus = dhc.Status
 	dhc.LastTimeStamp = dhc.TimeStamp
+	seelog.Infof("DHC LastTimeStamp: %v", dhc.LastTimeStamp)
+	seelog.Infof("DHC Instance Pointer (being updated): %p", dhc)
 
 	// update latest status
 	dhc.Status = healthStatus
