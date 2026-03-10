@@ -44,7 +44,7 @@ jobs:
 
       - name: Fetch dev branch
         run: |
-          git fetch origin dev:dev
+          git fetch origin master:master
 
       - name: Create staging branch
         run: |
