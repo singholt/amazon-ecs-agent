@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.103.0
+* Enhancement - <!-- [#4889](https://github.com/aws/amazon-ecs-agent/pull/4889)
+
 # 1.102.1
 * Enhancement - Improve ENI watcher udev logging [#4887](https://github.com/aws/amazon-ecs-agent/pull/4887)
 * Enhancement - Update go version to 1.25.7, Update unit test coverage logic [#4886](https://github.com/aws/amazon-ecs-agent/pull/4886)
