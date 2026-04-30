@@ -142,6 +142,17 @@ func (imageManager *dockerImageManager) RecordContainerReference(container *apic
 		if !imageManager.addContainerReferenceToExistingImageState(container) {
 			return fmt.Errorf("Failed to add container to existing image state")
 		}
+		// ImageManagedEnvKeys are runtime-only (json:"-"); re-populate from Docker on each start.
+		imageInspected, err := imageManager.client.InspectImage(container.ImageID)
+		if err != nil {
+			fields := container.Fields()
+			fields[field.Error] = err
+			logger.Error("Error inspecting image", fields)
+			return err
+		}
+		if imageInspected.Config != nil {
+			container.SetImageManagedEnvKeys(imageInspected.Config.Env)
+		}
 		return nil
 	}
 
@@ -163,6 +174,10 @@ func (imageManager *dockerImageManager) RecordContainerReference(container *apic
 	if container.GetImageDigest() == "" {
 		imageDigest := imageManager.fetchRepoDigest(imageInspected, container)
 		container.SetImageDigest(imageDigest)
+	}
+	// Capture managed image env keys for use at container create time.
+	if imageInspected.Config != nil {
+		container.SetImageManagedEnvKeys(imageInspected.Config.Env)
 	}
 	added := imageManager.addContainerReferenceToExistingImageState(container)
 	if !added {

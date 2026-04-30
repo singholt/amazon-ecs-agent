@@ -35,6 +35,7 @@ import (
 	ec2testutil "github.com/aws/amazon-ecs-agent/agent/utils/test/ec2util"
 
 	"github.com/docker/docker/api/types"
+	dockercontainer "github.com/docker/docker/api/types/container"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -189,6 +190,125 @@ func TestRecordContainerReferenceInspectError(t *testing.T) {
 	err := imageManager.RecordContainerReference(container)
 	if err == nil {
 		t.Error("Expected error in inspecting image while adding container to image state")
+	}
+}
+
+func TestRecordContainerReferenceStoresImageEnvVars(t *testing.T) {
+	envVars := []string{"PATH=/usr/local/bin", "AWS_DEFAULT_REGION=us-east-1"}
+	tests := []struct {
+		name                    string
+		config                  *dockercontainer.Config
+		wantImageManagedEnvKeys map[string]bool
+	}{
+		{
+			name:                    "image config with region env var — key stored on container",
+			config:                  &dockercontainer.Config{Env: envVars},
+			wantImageManagedEnvKeys: map[string]bool{"AWS_DEFAULT_REGION": true},
+		},
+		{
+			name:                    "nil image config — ImageManagedEnvKeys left nil",
+			config:                  nil,
+			wantImageManagedEnvKeys: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			client := mock_dockerapi.NewMockDockerClient(ctrl)
+
+			imageManager := NewImageManager(defaultTestConfig(), client, dockerstate.NewTaskEngineState())
+			imageManager.SetDataClient(data.NewNoopClient())
+
+			container := &apicontainer.Container{
+				Name:  "testContainer",
+				Image: "testContainerImage",
+			}
+			client.EXPECT().InspectImage(container.Image).Return(&types.ImageInspect{
+				ID:     "sha256:qwerty",
+				Config: tt.config,
+			}, nil)
+
+			err := imageManager.RecordContainerReference(container)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.wantImageManagedEnvKeys, container.ImageManagedEnvKeys)
+		})
+	}
+}
+
+// TestRecordContainerReferencePopulatesImageManagedEnvKeysWhenImageIDKnown verifies that when a container
+// already has an ImageID set (e.g. on agent restart from saved state), RecordContainerReference
+// inspects the image by ID to populate ImageManagedEnvKeys, so that ApplyRegionToContainer can still
+// check image-level env vars before injecting region.
+func TestRecordContainerReferencePopulatesImageManagedEnvKeysWhenImageIDKnown(t *testing.T) {
+	envVars := []string{"PATH=/usr/local/bin", "AWS_DEFAULT_REGION=us-east-1"}
+	tests := []struct {
+		name                    string
+		config                  *dockercontainer.Config
+		inspectErr              error
+		wantImageManagedEnvKeys map[string]bool
+		wantErr                 bool
+	}{
+		{
+			name:                    "image config has region env var — ImageManagedEnvKeys populated via inspect by ID",
+			config:                  &dockercontainer.Config{Env: envVars},
+			wantImageManagedEnvKeys: map[string]bool{"AWS_DEFAULT_REGION": true},
+		},
+		{
+			name:                    "nil image config — ImageManagedEnvKeys left nil",
+			config:                  nil,
+			wantImageManagedEnvKeys: nil,
+		},
+		{
+			// Inspect failure means the image is gone or Docker is unhealthy;
+			// propagate the error rather than proceeding silently.
+			name:       "inspect error — error returned",
+			inspectErr: errors.New("error inspecting image"),
+			wantErr:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			client := mock_dockerapi.NewMockDockerClient(ctrl)
+
+			imageManager := NewImageManager(defaultTestConfig(), client, dockerstate.NewTaskEngineState())
+			imageManager.SetDataClient(data.NewNoopClient())
+
+			const imageID = "sha256:qwerty"
+
+			// Seed the image state so the early-return path succeeds.
+			sourceImageState := &image.ImageState{
+				Image: &image.Image{ImageID: imageID},
+			}
+			imageManager.(*dockerImageManager).addImageState(sourceImageState)
+
+			container := &apicontainer.Container{
+				Name:    "testContainer",
+				Image:   "testContainerImage",
+				ImageID: imageID, // pre-populated, as it would be after agent restart
+			}
+
+			if tt.inspectErr != nil {
+				client.EXPECT().InspectImage(imageID).Return(nil, tt.inspectErr)
+			} else {
+				client.EXPECT().InspectImage(imageID).Return(&types.ImageInspect{
+					ID:     imageID,
+					Config: tt.config,
+				}, nil)
+			}
+
+			err := imageManager.RecordContainerReference(container)
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.wantImageManagedEnvKeys, container.ImageManagedEnvKeys)
+			}
+		})
 	}
 }
 

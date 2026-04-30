@@ -1562,3 +1562,55 @@ func TestGetUser(t *testing.T) {
 		})
 	}
 }
+
+func TestSetImageManagedEnvKeys(t *testing.T) {
+	tests := []struct {
+		name     string
+		imageEnv []string
+		wantKeys map[string]bool
+	}{
+		{
+			name:     "no managed keys in image env — map empty",
+			imageEnv: []string{"PATH=/usr/local/bin", "HOME=/root"},
+			wantKeys: map[string]bool{},
+		},
+		{
+			name:     "AWS_REGION present with value — recorded",
+			imageEnv: []string{"AWS_REGION=us-east-1"},
+			wantKeys: map[string]bool{"AWS_REGION": true},
+		},
+		{
+			name:     "AWS_DEFAULT_REGION present with value — recorded",
+			imageEnv: []string{"PATH=/usr/local/bin", "AWS_DEFAULT_REGION=eu-west-1"},
+			wantKeys: map[string]bool{"AWS_DEFAULT_REGION": true},
+		},
+		{
+			name:     "both region vars present — both recorded",
+			imageEnv: []string{"AWS_REGION=us-east-1", "AWS_DEFAULT_REGION=eu-west-1"},
+			wantKeys: map[string]bool{"AWS_REGION": true, "AWS_DEFAULT_REGION": true},
+		},
+		{
+			name:     "AWS_REGION set to empty (KEY=) — recorded with warning",
+			imageEnv: []string{"AWS_REGION="},
+			wantKeys: map[string]bool{"AWS_REGION": true},
+		},
+		{
+			name:     "AWS_REGION bare with no equals (KEY) — recorded with warning",
+			imageEnv: []string{"AWS_REGION"},
+			wantKeys: map[string]bool{"AWS_REGION": true},
+		},
+		{
+			name:     "nil image env — map empty",
+			imageEnv: nil,
+			wantKeys: map[string]bool{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Container{Name: "app"}
+			c.SetImageManagedEnvKeys(tt.imageEnv)
+			assert.Equal(t, tt.wantKeys, c.ImageManagedEnvKeys)
+		})
+	}
+}
