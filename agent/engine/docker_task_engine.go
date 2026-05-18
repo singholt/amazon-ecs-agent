@@ -2059,7 +2059,11 @@ func (engine *DockerTaskEngine) createContainer(task *apitask.Task, container *a
 	}
 
 	// Inject AWS_REGION / AWS_DEFAULT_REGION unless already set in the task definition or image.
-	task.ApplyRegionToContainer(container, engine.cfg.AWSRegion)
+	var imageManagedEnvKeys map[string]bool
+	if imageState, ok := engine.imageManager.GetImageStateFromImageName(container.Image); ok && imageState != nil {
+		imageManagedEnvKeys = imageState.GetManagedEnvKeys()
+	}
+	task.ApplyRegionToContainer(container, engine.cfg.AWSRegion, imageManagedEnvKeys)
 
 	config, err := task.DockerConfig(container, dockerClientVersion)
 	if err != nil {

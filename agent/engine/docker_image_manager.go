@@ -139,19 +139,8 @@ func (imageManager *dockerImageManager) RecordContainerReference(container *apic
 	// On agent restart, container ID was retrieved from agent state file
 	// TODO add setter and getter for modifying this
 	if container.ImageID != "" {
-		if !imageManager.addContainerReferenceToExistingImageState(container) {
+		if !imageManager.addContainerReferenceToExistingImageState(container, nil) {
 			return fmt.Errorf("Failed to add container to existing image state")
-		}
-		// ImageManagedEnvKeys are runtime-only (json:"-"); re-populate from Docker on each start.
-		imageInspected, err := imageManager.client.InspectImage(container.ImageID)
-		if err != nil {
-			fields := container.Fields()
-			fields[field.Error] = err
-			logger.Error("Error inspecting image", fields)
-			return err
-		}
-		if imageInspected.Config != nil {
-			container.SetImageManagedEnvKeys(imageInspected.Config.Env)
 		}
 		return nil
 	}
@@ -175,13 +164,15 @@ func (imageManager *dockerImageManager) RecordContainerReference(container *apic
 		imageDigest := imageManager.fetchRepoDigest(imageInspected, container)
 		container.SetImageDigest(imageDigest)
 	}
-	// Capture managed image env keys for use at container create time.
+	// Capture managed image env keys so ApplyRegionToContainer can skip
+	// injection when the image already declares AWS_REGION / AWS_DEFAULT_REGION.
+	var managedEnvKeys map[string]bool
 	if imageInspected.Config != nil {
-		container.SetImageManagedEnvKeys(imageInspected.Config.Env)
+		managedEnvKeys = image.ParseManagedEnvKeys(imageInspected.Config.Env)
 	}
-	added := imageManager.addContainerReferenceToExistingImageState(container)
+	added := imageManager.addContainerReferenceToExistingImageState(container, managedEnvKeys)
 	if !added {
-		imageManager.addContainerReferenceToNewImageState(container, imageInspected.Size)
+		imageManager.addContainerReferenceToNewImageState(container, imageInspected.Size, managedEnvKeys)
 	}
 	return nil
 }
@@ -206,7 +197,7 @@ func (imageManager *dockerImageManager) fetchRepoDigest(imageInspected *types.Im
 	return resultRepoDigest
 }
 
-func (imageManager *dockerImageManager) addContainerReferenceToExistingImageState(container *apicontainer.Container) bool {
+func (imageManager *dockerImageManager) addContainerReferenceToExistingImageState(container *apicontainer.Container, managedEnvKeys map[string]bool) bool {
 	// this lock is used for reading the image states in the image manager
 	imageManager.updateLock.RLock()
 	defer imageManager.updateLock.RUnlock()
@@ -214,12 +205,18 @@ func (imageManager *dockerImageManager) addContainerReferenceToExistingImageStat
 	imageState, ok := imageManager.getImageState(container.ImageID)
 	if ok {
 		imageState.UpdateImageState(container)
+		// Only update ManagedEnvKeys when callers have a fresh inspection result;
+		// callers without an inspection (e.g. agent-restart fast path) pass nil
+		// and the persisted value is preserved.
+		if managedEnvKeys != nil {
+			imageState.SetManagedEnvKeys(managedEnvKeys)
+		}
 		imageManager.saveImageStateData(imageState)
 	}
 	return ok
 }
 
-func (imageManager *dockerImageManager) addContainerReferenceToNewImageState(container *apicontainer.Container, imageSize int64) {
+func (imageManager *dockerImageManager) addContainerReferenceToNewImageState(container *apicontainer.Container, imageSize int64, managedEnvKeys map[string]bool) {
 	// this lock is used while creating and adding new image state to image manager
 	imageManager.updateLock.Lock()
 	defer imageManager.updateLock.Unlock()
@@ -228,6 +225,9 @@ func (imageManager *dockerImageManager) addContainerReferenceToNewImageState(con
 	imageState, ok := imageManager.getImageState(container.ImageID)
 	if ok {
 		imageState.UpdateImageState(container)
+		if managedEnvKeys != nil {
+			imageState.SetManagedEnvKeys(managedEnvKeys)
+		}
 		imageManager.saveImageStateData(imageState)
 	} else {
 		sourceImage := &image.Image{
@@ -235,9 +235,10 @@ func (imageManager *dockerImageManager) addContainerReferenceToNewImageState(con
 			Size:    imageSize,
 		}
 		sourceImageState := &image.ImageState{
-			Image:      sourceImage,
-			PulledAt:   time.Now(),
-			LastUsedAt: time.Now(),
+			Image:          sourceImage,
+			PulledAt:       time.Now(),
+			LastUsedAt:     time.Now(),
+			ManagedEnvKeys: managedEnvKeys,
 		}
 		sourceImageState.UpdateImageState(container)
 		imageManager.addImageState(sourceImageState)

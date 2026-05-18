@@ -101,13 +101,6 @@ var (
 	// MetadataURIFormat defines the URI format for v3 metadata endpoint. Made as a var to be able to
 	// overwrite it in test.
 	MetadataURIFormat = "http://169.254.170.2/v3/%s"
-
-	// managedEnvKeys is the set of image env var keys the agent checks before
-	// injecting default values. Add keys here to extend injection to new vars.
-	managedEnvKeys = map[string]bool{
-		"AWS_REGION":         true,
-		"AWS_DEFAULT_REGION": true,
-	}
 )
 
 // DockerConfig represents additional metadata about a container to run. It's
@@ -182,9 +175,6 @@ type Container struct {
 	ImageID string
 	// ImageDigest is the sha-256 digest of the container image as pulled from the repository
 	ImageDigest string
-	// ImageManagedEnvKeys is the subset of managed env var keys found in the image config.
-	// It is populated at runtime via image inspection and intentionally not persisted (json:"-").
-	ImageManagedEnvKeys map[string]bool `json:"-"`
 	// Command is the command to run in the container which is specified in the task definition
 	Command []string
 	// CPU is the cpu limitation of the container which is specified in the task definition
@@ -772,24 +762,6 @@ func (c *Container) SetImageDigest(ImageDigest string) {
 	defer c.lock.Unlock()
 
 	c.ImageDigest = ImageDigest
-}
-
-// SetImageManagedEnvKeys records which managed env var keys are present in the image env.
-// Warns if a key is present with an empty value.
-func (c *Container) SetImageManagedEnvKeys(imageEnv []string) {
-	c.ImageManagedEnvKeys = make(map[string]bool)
-	for _, kv := range imageEnv {
-		key, value, found := strings.Cut(kv, "=")
-		if managedEnvKeys[key] {
-			if !found || value == "" {
-				logger.Warn("Env var was set to empty", logger.Fields{
-					field.Container: c.Name,
-					"key":           key,
-				})
-			}
-			c.ImageManagedEnvKeys[key] = true
-		}
-	}
 }
 
 // GetImageDigest gets the ImageDigest for a container

@@ -1030,8 +1030,10 @@ func (task *Task) initializeCredentialsEndpoint(credentialsManager credentials.M
 
 // ApplyRegionToContainer injects AWS_REGION and AWS_DEFAULT_REGION into the
 // container environment. Injection is skipped if either var is already set in
-// the task definition or container image.
-func (task *Task) ApplyRegionToContainer(container *apicontainer.Container, region string) {
+// the task definition or container image. The image-level managed env keys
+// (i.e. which of the two vars the image already declares) are passed in by
+// the caller, which looks them up on the corresponding ImageState.
+func (task *Task) ApplyRegionToContainer(container *apicontainer.Container, region string, imageManagedEnvKeys map[string]bool) {
 	if region == "" {
 		return
 	}
@@ -1048,7 +1050,7 @@ func (task *Task) ApplyRegionToContainer(container *apicontainer.Container, regi
 	}
 
 	// Skip if the image already has a region preference (e.g. Dockerfile ENV).
-	if container.ImageManagedEnvKeys[awsRegionEnvVar] || container.ImageManagedEnvKeys[awsDefaultRegionEnvVar] {
+	if imageManagedEnvKeys[awsRegionEnvVar] || imageManagedEnvKeys[awsDefaultRegionEnvVar] {
 		return
 	}
 
