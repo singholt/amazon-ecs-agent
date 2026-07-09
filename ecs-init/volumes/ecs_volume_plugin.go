@@ -33,12 +33,22 @@ const (
 	defaultDriverType = "efs"
 )
 
-// AmazonECSVolumePlugin holds list of volume drivers and volumes information
+// AmazonECSVolumePlugin holds the volume drivers and the set of managed volumes.
+//
+// Each volume is owned by a volumeWorker (see ecs_volume_plugin_worker.go) that
+// serializes mount, unmount and remove operations for that volume on its own
+// goroutine. Operations on different volumes therefore proceed concurrently and
+// are never serialized behind a single lock while a mount/unmount syscall is in
+// flight.
 type AmazonECSVolumePlugin struct {
 	volumeDrivers map[string]driver.VolumeDriver
 	volumes       map[string]*types.Volume
 	state         *StateManager
-	lock          sync.RWMutex
+	workers       map[string]*volumeWorker
+	// volumesLock guards the volumes and workers maps. It is held only for fast
+	// map lookups and mutations, never while a mount/unmount syscall is in flight,
+	// so that per-volume I/O on the worker goroutines is never serialized behind it.
+	volumesLock sync.RWMutex
 }
 
 // NewAmazonECSVolumePlugin initiates the volume drivers
@@ -50,14 +60,53 @@ func NewAmazonECSVolumePlugin() *AmazonECSVolumePlugin {
 		},
 		volumes: make(map[string]*types.Volume),
 		state:   NewStateManager(),
+		workers: make(map[string]*volumeWorker),
 	}
 	return plugin
 }
 
+// getOrCreateWorker returns the worker that owns the named volume, creating and
+// starting one on demand. It returns nil if the volume does not exist. It uses
+// double-checked locking so the common (already-exists) path takes only a read
+// lock, and never holds volumesLock while dispatching to or waiting on a worker.
+func (a *AmazonECSVolumePlugin) getOrCreateWorker(name string) *volumeWorker {
+	a.volumesLock.RLock()
+	vw := a.workers[name]
+	a.volumesLock.RUnlock()
+	if vw != nil {
+		return vw
+	}
+
+	a.volumesLock.Lock()
+	defer a.volumesLock.Unlock()
+	if vw = a.workers[name]; vw != nil {
+		return vw
+	}
+	vol, ok := a.volumes[name]
+	if !ok {
+		return nil
+	}
+	// getVolumeDriver only fails for an unsupported type, which Create rejects
+	// before registering a volume; a nil driver is handled by the worker.
+	volDriver, _ := a.getVolumeDriver(vol.Type)
+	vw = &volumeWorker{
+		name:    name,
+		vol:     vol,
+		driver:  volDriver,
+		state:   a.state,
+		cleanup: a.CleanupMountPath,
+		mailbox: make(chan func(), volumeWorkerMailboxSize),
+		stopped: make(chan struct{}),
+	}
+	a.workers[name] = vw
+	go vw.run()
+	return vw
+}
+
 // LoadState loads past state information of the plugin
 func (a *AmazonECSVolumePlugin) LoadState() error {
-	a.lock.Lock()
-	defer a.lock.Unlock()
+	a.volumesLock.Lock()
+	defer a.volumesLock.Unlock()
 	seelog.Info("Loading plugin state information")
 	oldState := &VolumeState{}
 	if !fileExists(PluginStateFileAbsPath) {
@@ -112,10 +161,12 @@ func (a *AmazonECSVolumePlugin) getVolumeDriver(driverType string) (driver.Volum
 	return a.volumeDrivers[driverType], nil
 }
 
-// Create implements Docker volume plugin's Create Method
+// Create implements Docker volume plugin's Create Method.
+// Create is metadata-only (no mount I/O), so it runs under the registry lock.
+// The per-volume worker is created lazily on the first Mount/Unmount/Remove.
 func (a *AmazonECSVolumePlugin) Create(r *volume.CreateRequest) error {
-	a.lock.Lock()
-	defer a.lock.Unlock()
+	a.volumesLock.Lock()
+	defer a.volumesLock.Unlock()
 
 	seelog.Infof("Creating new volume %s", r.Name)
 	_, ok := a.volumes[r.Name]
@@ -198,7 +249,10 @@ func deleteMountPath(path string) error {
 	return os.Remove(path)
 }
 
-// Mount implements Docker volume plugin's Mount Method
+// Mount implements Docker volume plugin's Mount Method.
+// The mount I/O is executed on the volume's worker goroutine, so mounts for
+// different volumes proceed concurrently while mounts for the same volume are
+// serialized.
 func (a *AmazonECSVolumePlugin) Mount(r *volume.MountRequest) (*volume.MountResponse, error) {
 	seelog.Infof("Received mount request %+v", r)
 
@@ -210,61 +264,22 @@ func (a *AmazonECSVolumePlugin) Mount(r *volume.MountRequest) (*volume.MountResp
 		return nil, fmt.Errorf("no mount ID in the request")
 	}
 
-	// Acquire write lock
-	a.lock.Lock()
-	defer a.lock.Unlock()
-
-	// Find the volume
-	vol, ok := a.volumes[r.Name]
-	if !ok {
+	vw := a.getOrCreateWorker(r.Name)
+	if vw == nil {
 		seelog.Errorf("Volume %s to mount is not found", r.Name)
 		return nil, fmt.Errorf("volume %s not found", r.Name)
 	}
 
-	// Find the volume driver
-	volDriver, err := a.getVolumeDriver(vol.Type)
-	if err != nil {
-		seelog.Errorf("Volume %s's driver type %s not supported: %v", r.Name, vol.Type, err)
-		return nil, fmt.Errorf("Volume %s's driver type %s not supported: %w", r.Name, vol.Type, err)
+	var resp *volume.MountResponse
+	var mErr error
+	if !vw.do(func() { resp, mErr = vw.mount(r.ID) }) {
+		return nil, fmt.Errorf("volume %s was removed", r.Name)
 	}
-	if volDriver == nil {
-		// This case shouldn't happen normally
-		return nil, fmt.Errorf("no volume driver found for type %s", vol.Type)
-	}
-
-	// Mount the volume on the host if there are no active mounts for the volume.
-	if len(vol.Mounts) == 0 {
-		seelog.Infof("Mounting volume %s as there are no existing mounts for it", r.Name)
-		createReq := &driver.CreateRequest{Name: r.Name, Path: vol.Path, Options: vol.Options}
-		if err := volDriver.Create(createReq); err != nil {
-			seelog.Errorf("Volume %s creation failure: %v", r.Name, err)
-			return nil, fmt.Errorf("failed to mount volume %s: %w", r.Name, err)
-		}
-		seelog.Infof("Volume %s mounted successfully", r.Name)
-	}
-
-	// Update state
-	seelog.Infof("Adding mount %s to volume %s", r.ID, r.Name)
-	vol.AddMount(r.ID)
-	if err := a.state.recordVolume(r.Name, vol); err != nil {
-		// State update failed, so roll back the changes made so far to make state consistent
-		seelog.Errorf("Failed to save volume %s, rolling back changes: %v", r.Name, err)
-		vol.RemoveMount(r.ID)
-		if len(vol.Mounts) == 0 {
-			seelog.Warnf("Rolling back mounting of volume %s", r.Name)
-			if err := volDriver.Remove(&driver.RemoveRequest{Name: r.Name}); err != nil {
-				seelog.Errorf("Volume %s removal failure: %v", r.Name, err)
-			}
-		}
-		a.state.recordVolume(r.Name, vol)
-		return nil, fmt.Errorf("mount failed due to an error while saving state: %w", err)
-	}
-
-	// All good
-	return &volume.MountResponse{Mountpoint: vol.Path}, nil
+	return resp, mErr
 }
 
-// Unmount implements Docker volume plugin's Unmount Method
+// Unmount implements Docker volume plugin's Unmount Method.
+// The unmount I/O is executed on the volume's worker goroutine.
 func (a *AmazonECSVolumePlugin) Unmount(r *volume.UnmountRequest) error {
 	seelog.Infof("Received unmount request %+v", r)
 
@@ -276,110 +291,59 @@ func (a *AmazonECSVolumePlugin) Unmount(r *volume.UnmountRequest) error {
 		return fmt.Errorf("no mount ID in the request")
 	}
 
-	// Acquire write lock
-	a.lock.Lock()
-	defer a.lock.Unlock()
-
-	// Find the volume
-	vol, ok := a.volumes[r.Name]
-	if !ok {
+	vw := a.getOrCreateWorker(r.Name)
+	if vw == nil {
 		seelog.Errorf("Volume %s to unmount is not found", r.Name)
 		return fmt.Errorf("volume %s not found", r.Name)
 	}
 
-	// Get the corresponding volume driver
-	volDriver, err := a.getVolumeDriver(vol.Type)
-	if err != nil {
-		seelog.Errorf("Volume %s removal failure: %v", r.Name, err)
-		return fmt.Errorf("volume %v of type %s is unsupported: %w", r.Name, vol.Type, err)
+	var uErr error
+	if !vw.do(func() { uErr = vw.unmount(r.ID) }) {
+		return fmt.Errorf("volume %s was removed", r.Name)
 	}
-	if volDriver == nil {
-		// this case should not happen normally
-		return fmt.Errorf("no corresponding volume driver found for type %s", vol.Type)
-	}
-
-	// Remove the mount from the volume
-	seelog.Infof("Removing mount %s from volume %s", r.ID, r.Name)
-	if exists := vol.RemoveMount(r.ID); !exists {
-		seelog.Warnf("Mount %s was not found on volume %s, this is a no-op", r.ID, r.Name)
-		return nil
-	}
-
-	// If there are no more mounts left on the volume then unmount the volume from the host
-	if len(vol.Mounts) == 0 {
-		seelog.Infof("No active mounts left on volume %s, unmounting it", r.Name)
-		if err := volDriver.Remove(&driver.RemoveRequest{Name: r.Name}); err != nil {
-			seelog.Errorf("Failed to unmount volume %v: %v", r.Name, err)
-			return fmt.Errorf("failed to unmount volume %v: %w", r.Name, err)
-		}
-	}
-
-	// Save state
-	if err := a.state.recordVolume(r.Name, vol); err != nil {
-		// State save failed, so roll back the changes made so far to make state consistent
-		seelog.Errorf("Error saving state of volume %s", r.Name, err)
-	}
-
-	// All good
-	return nil
+	return uErr
 }
 
-// Remove implements Docker volume plugin's Remove Method
+// Remove implements Docker volume plugin's Remove Method.
+// The removal is dispatched to the volume's worker so it serializes behind any
+// in-flight Mount/Unmount for the same volume. On success the worker is stopped
+// and the volume is dropped from the registry.
 func (a *AmazonECSVolumePlugin) Remove(r *volume.RemoveRequest) error {
 	seelog.Infof("Received Remove request %+v", r)
 
-	a.lock.Lock()
-	defer a.lock.Unlock()
-
-	seelog.Infof("Removing volume %s", r.Name)
-	vol, ok := a.volumes[r.Name]
-	if !ok {
+	vw := a.getOrCreateWorker(r.Name)
+	if vw == nil {
 		seelog.Errorf("Volume %s to remove is not found", r.Name)
 		return fmt.Errorf("volume %s not found", r.Name)
 	}
 
-	// get corresponding volume driver to unmount
-	volDriver, err := a.getVolumeDriver(vol.Type)
-	if err != nil {
-		seelog.Errorf("Volume %s removal failure: %s", r.Name, err)
-		return err
-	}
-	if volDriver == nil {
-		// this case should not happen normally
-		return fmt.Errorf("no corresponding volume driver found for type %s", vol.Type)
-	}
-
-	// Although unmounts are handled by Unmount method, unmount the volume if it's still
-	// mounted. This is mainly to unmount volumes created by an older version of the
-	// plugin in which unmounts were not handled by Unmount method.
-	if volDriver.IsMounted(r.Name) {
-		seelog.Infof("Volume %s is currently mounted, unmouting it", r.Name)
-		if err := volDriver.Remove(&driver.RemoveRequest{Name: r.Name}); err != nil {
-			seelog.Errorf("Volume %s removal failure: %v", r.Name, err)
-			return err
+	var rmErr error
+	if !vw.do(func() {
+		rmErr = vw.remove()
+		if rmErr == nil {
+			// Ask the worker loop to exit after this message.
+			vw.stop = true
 		}
+	}) {
+		// Worker already stopped: the volume was concurrently removed.
+		return nil
+	}
+	if rmErr != nil {
+		// Keep the volume and its worker intact on failure.
+		return rmErr
 	}
 
-	// remove the volume information
+	a.volumesLock.Lock()
+	delete(a.workers, r.Name)
 	delete(a.volumes, r.Name)
-	// cleanup the volume's host mount path
-	err = a.CleanupMountPath(vol.Path)
-	if err != nil {
-		seelog.Errorf("Cleaning mount path failed for volume %s: %v", r.Name, err)
-	}
-	seelog.Infof("Saving state after removing volume %s", r.Name)
-	// remove the state of deleted volume
-	err = a.state.removeVolume(r.Name)
-	if err != nil {
-		seelog.Errorf("Error saving state after removing volume %s: %v", r.Name, err)
-	}
+	a.volumesLock.Unlock()
 	return nil
 }
 
 // List implements Docker volume plugin's List Method
 func (a *AmazonECSVolumePlugin) List() (*volume.ListResponse, error) {
-	a.lock.RLock()
-	defer a.lock.RUnlock()
+	a.volumesLock.RLock()
+	defer a.volumesLock.RUnlock()
 	vols := make([]*volume.Volume, len(a.volumes))
 	i := 0
 	for volName := range a.volumes {
@@ -396,8 +360,8 @@ func (a *AmazonECSVolumePlugin) List() (*volume.ListResponse, error) {
 
 // Get implements Docker volume plugin's Get Method
 func (a *AmazonECSVolumePlugin) Get(r *volume.GetRequest) (*volume.GetResponse, error) {
-	a.lock.RLock()
-	defer a.lock.RUnlock()
+	a.volumesLock.RLock()
+	defer a.volumesLock.RUnlock()
 	vol, ok := a.volumes[r.Name]
 	if !ok {
 		return nil, fmt.Errorf("volume %s not found", r.Name)
@@ -413,8 +377,8 @@ func (a *AmazonECSVolumePlugin) Get(r *volume.GetRequest) (*volume.GetResponse, 
 
 // Path implements Docker volume plugin's Path Method
 func (a *AmazonECSVolumePlugin) Path(r *volume.PathRequest) (*volume.PathResponse, error) {
-	a.lock.RLock()
-	defer a.lock.RUnlock()
+	a.volumesLock.RLock()
+	defer a.volumesLock.RUnlock()
 	vol, ok := a.volumes[r.Name]
 	if !ok {
 		seelog.Errorf("Could not find mount path for volume %s", r.Name)
