@@ -23,6 +23,7 @@ import (
 	"github.com/aws/amazon-ecs-agent/ecs-agent/acs/model/ecsacs"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // TestIAMRoleCredentialsFromACS tests if credentials sent from ACS can be
@@ -102,8 +103,12 @@ func TestSetAndGetTaskCredentialsHappyPath(t *testing.T) {
 		},
 	}
 
+	// A denial recorded before the credentials arrive is retired by their arrival.
+	manager.SetAccessDeniedCredentials("cid1")
+
 	err := manager.SetTaskCredentials(&credentials)
 	assert.NoError(t, err, "Error adding credentials")
+	assert.False(t, manager.IsCredentialsAccessDenied("cid1"))
 
 	credentialsFromManager, ok := manager.GetTaskCredentials("cid1")
 	assert.True(t, ok, "GetTaskCredentials returned false for existing credentials")
@@ -166,11 +171,14 @@ func TestRemoveExistingCredentials(t *testing.T) {
 	assert.True(t, ok, "GetTaskCredentials returned false for existing credentials")
 	assert.Equal(t, credentials, credentialsFromManager, "Mismatch between added and retrieved credentials")
 
+	manager.SetAccessDeniedCredentials("cid1")
+
 	manager.RemoveCredentials("cid1")
 	_, ok = manager.GetTaskCredentials("cid1")
 	if ok {
 		t.Error("Expected GetTaskCredentials to return false for removed credentials")
 	}
+	assert.False(t, manager.IsCredentialsAccessDenied("cid1"))
 }
 
 // TestAddKnownCredentialsID tests that AddKnownCredentialsID properly tracks credentials IDs
@@ -222,4 +230,108 @@ func TestIsCredentialsPending(t *testing.T) {
 	// Case 4: After removal - should return false
 	manager.RemoveCredentials(credentialsID)
 	assert.False(t, manager.IsCredentialsPending(credentialsID))
+}
+
+// testTaskCredentials returns a valid TaskIAMRoleCredentials for the given
+// credentials id.
+func testTaskCredentials(credentialsID string) *TaskIAMRoleCredentials {
+	return &TaskIAMRoleCredentials{
+		ARN: "t1",
+		IAMRoleCredentials: IAMRoleCredentials{
+			CredentialsID: credentialsID,
+			AccessKeyID:   "akid1",
+		},
+	}
+}
+
+func TestSetAccessDeniedCredentials(t *testing.T) {
+	const credentialsID = "cid1"
+
+	tests := []struct {
+		name                  string
+		setup                 func(*testing.T, Manager)
+		expectCredentialsHeld bool
+	}{
+		{
+			name:  "records a denial for an id with no credentials",
+			setup: func(*testing.T, Manager) {},
+		},
+		{
+			name: "recording the same denial twice is idempotent",
+			setup: func(t *testing.T, manager Manager) {
+				manager.SetAccessDeniedCredentials(credentialsID)
+			},
+		},
+		{
+			name: "leaves credentials already held for the id in place",
+			setup: func(t *testing.T, manager Manager) {
+				require.NoError(t, manager.SetTaskCredentials(testTaskCredentials(credentialsID)))
+			},
+			expectCredentialsHeld: true,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			manager := NewManager()
+			tc.setup(t, manager)
+
+			manager.SetAccessDeniedCredentials(credentialsID)
+
+			assert.True(t, manager.IsCredentialsAccessDenied(credentialsID))
+			creds, ok := manager.GetTaskCredentials(credentialsID)
+			assert.Equal(t, tc.expectCredentialsHeld, ok)
+			if tc.expectCredentialsHeld {
+				assert.Equal(t, "akid1", creds.IAMRoleCredentials.AccessKeyID)
+			}
+		})
+	}
+}
+
+// TestIsCredentialsAccessDenied tests that IsCredentialsAccessDenied reports a
+// denial only for the id it was recorded against.
+func TestIsCredentialsAccessDenied(t *testing.T) {
+	const credentialsID = "cid1"
+
+	tests := []struct {
+		name     string
+		setup    func(*testing.T, Manager)
+		expected bool
+	}{
+		{
+			name:     "no denial recorded",
+			setup:    func(*testing.T, Manager) {},
+			expected: false,
+		},
+		{
+			name: "denial recorded for the id",
+			setup: func(t *testing.T, manager Manager) {
+				manager.SetAccessDeniedCredentials(credentialsID)
+			},
+			expected: true,
+		},
+		{
+			name: "denial recorded for a different id",
+			setup: func(t *testing.T, manager Manager) {
+				manager.SetAccessDeniedCredentials("cid2")
+			},
+			expected: false,
+		},
+		{
+			name: "credentials held for the id but no denial recorded",
+			setup: func(t *testing.T, manager Manager) {
+				require.NoError(t, manager.SetTaskCredentials(testTaskCredentials(credentialsID)))
+			},
+			expected: false,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			manager := NewManager()
+			tc.setup(t, manager)
+
+			assert.Equal(t, tc.expected, manager.IsCredentialsAccessDenied(credentialsID))
+		})
+	}
 }

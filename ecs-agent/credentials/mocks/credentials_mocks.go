@@ -75,6 +75,20 @@ func (mr *MockManagerMockRecorder) GetTaskCredentials(arg0 interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTaskCredentials", reflect.TypeOf((*MockManager)(nil).GetTaskCredentials), arg0)
 }
 
+// IsCredentialsAccessDenied mocks base method.
+func (m *MockManager) IsCredentialsAccessDenied(arg0 string) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsCredentialsAccessDenied", arg0)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsCredentialsAccessDenied indicates an expected call of IsCredentialsAccessDenied.
+func (mr *MockManagerMockRecorder) IsCredentialsAccessDenied(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsCredentialsAccessDenied", reflect.TypeOf((*MockManager)(nil).IsCredentialsAccessDenied), arg0)
+}
+
 // IsCredentialsPending mocks base method.
 func (m *MockManager) IsCredentialsPending(arg0 string) bool {
 	m.ctrl.T.Helper()
@@ -99,6 +113,18 @@ func (m *MockManager) RemoveCredentials(arg0 string) {
 func (mr *MockManagerMockRecorder) RemoveCredentials(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveCredentials", reflect.TypeOf((*MockManager)(nil).RemoveCredentials), arg0)
+}
+
+// SetAccessDeniedCredentials mocks base method.
+func (m *MockManager) SetAccessDeniedCredentials(arg0 string) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetAccessDeniedCredentials", arg0)
+}
+
+// SetAccessDeniedCredentials indicates an expected call of SetAccessDeniedCredentials.
+func (mr *MockManagerMockRecorder) SetAccessDeniedCredentials(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetAccessDeniedCredentials", reflect.TypeOf((*MockManager)(nil).SetAccessDeniedCredentials), arg0)
 }
 
 // SetTaskCredentials mocks base method.
