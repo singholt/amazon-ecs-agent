@@ -66,6 +66,11 @@ type ScanResult struct {
 	// authorized to assume. A consumer uses them to attribute a stale credential
 	// to that, as opposed to a broken delivery path.
 	AssumeRoleUnauthorizedAccessRoles []AssumeRoleUnauthorizedAccessIAMRole
+	// QueryCount is the number of IMDS requests issued during the scan, including
+	// namespace discovery, info files, and credential fetches. It bounds the
+	// packets-per-second cost of a scan and is used to tune the rate limiter and
+	// scan interval.
+	QueryCount int
 }
 
 // imdsCredential is used internally by the scanner to deserialize IMDS

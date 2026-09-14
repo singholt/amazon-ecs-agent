@@ -86,6 +86,9 @@ type scanner struct {
 	rateLimiter *rate.Limiter
 	// lastUpdated tracks the LastUpdated timestamp from each namespace's info file.
 	lastUpdated map[string]time.Time
+	// queryCount counts IMDS requests issued during the in-progress scan. It is
+	// reset at the start of each Scan and read into the ScanResult.
+	queryCount int
 	// metricsFactory emits metrics for scan operations.
 	metricsFactory metrics.EntryFactory
 }
@@ -104,6 +107,9 @@ func NewScanner(ec2MetadataClient ec2.EC2MetadataClient,
 // Scan discovers all ECS IAM namespaces, reads their info files, and
 // fetches credentials from namespaces that have changed since the last scan.
 func (s *scanner) Scan(ctx context.Context) (ScanResult, error) {
+	start := time.Now()
+	s.queryCount = 0
+
 	namespaces, err := s.discoverNamespaces(ctx)
 	if err != nil {
 		return ScanResult{}, fmt.Errorf("imds scan: discover namespaces: %w", err)
@@ -112,7 +118,7 @@ func (s *scanner) Scan(ctx context.Context) (ScanResult, error) {
 	// No namespaces is expected when IMDS does not have ECS task credentials yet.
 	if len(namespaces) == 0 {
 		logger.Debug("IMDS credentials scan: no iam-ecs namespace found")
-		return ScanResult{}, nil
+		return ScanResult{QueryCount: s.queryCount}, nil
 	}
 
 	var result ScanResult
@@ -139,6 +145,16 @@ func (s *scanner) Scan(ctx context.Context) (ScanResult, error) {
 		return ScanResult{}, fmt.Errorf("imds scan: all %d namespace(s) failed: %w",
 			len(scanErrors), errors.Join(scanErrors...))
 	}
+
+	result.QueryCount = s.queryCount
+	// Duration and query count bound the packets-per-second cost of a scan and
+	// inform tuning of the rate limiter and scan interval under load.
+	logger.Info("IMDS credentials scan complete", logger.Fields{
+		"durationMs":               time.Since(start).Milliseconds(),
+		"queryCount":               s.queryCount,
+		"namespaceCount":           len(namespaces),
+		"retrievedCredentialCount": len(result.Credentials),
+	})
 
 	return result, nil
 }
@@ -401,5 +417,8 @@ func (s *scanner) getMetadata(ctx context.Context, path string) (string, error) 
 		return "", err
 	}
 
+	// Count every issued request, including failures, since each consumes the
+	// instance's link-local packets-per-second budget.
+	s.queryCount++
 	return s.ec2MetadataClient.GetMetadata(path)
 }

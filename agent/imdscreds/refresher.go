@@ -96,6 +96,7 @@ func (r *IMDSCredentialsRefresher) refresh() {
 		return
 	}
 
+	start := time.Now()
 	result, err := r.scanner.Scan(r.ctx)
 	if err != nil {
 		logger.Error("IMDS credentials refresh: scan failed", logger.Fields{
@@ -133,6 +134,9 @@ func (r *IMDSCredentialsRefresher) refresh() {
 			"retrievedCredentialCount":              len(result.Credentials),
 			"upsertedCredentialCount":               upsertedCredCount,
 			"assumeRoleUnauthorizedAccessRoleCount": len(result.AssumeRoleUnauthorizedAccessRoles),
+			"queryCount":                            result.QueryCount,
+			"runningTaskCount":                      len(nonTerminalTasks),
+			"durationMs":                            time.Since(start).Milliseconds(),
 		})
 	}
 }
